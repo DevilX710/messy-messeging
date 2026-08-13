@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b0f14">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="styles.css">
+  <title>Messy Messenger</title>
+</head>
+<body>
+  <div id="app">
+    <section id="authView" class="screen">
+      <div class="auth-card">
+        <div class="logo">💬</div>
+        <h1>Messy</h1>
+        <p class="muted">Your private little messenger.</p>
+        <div class="tabs">
+          <button class="tab active" data-auth="login">Log in</button>
+          <button class="tab" data-auth="signup">Create account</button>
+        </div>
+        <form id="authForm">
+          <input id="email" type="email" placeholder="Email" required autocomplete="email">
+          <input id="password" type="password" placeholder="Password" required minlength="6" autocomplete="current-password">
+          <input id="username" class="signup-only hidden" type="text" placeholder="Username" maxlength="24" autocomplete="nickname">
+          <button class="primary" type="submit" id="authButton">Log in</button>
+        </form>
+        <p id="authMsg" class="error"></p>
+      </div>
+    </section>
+
+    <section id="chatView" class="hidden">
+      <aside class="sidebar">
+        <header class="side-head">
+          <div>
+            <h2>Messages</h2>
+            <span id="meLabel" class="muted"></span>
+          </div>
+          <button id="logoutBtn" class="icon-btn" title="Log out">↪</button>
+        </header>
+        <div class="search-wrap">
+          <input id="userSearch" placeholder="Search users..." autocomplete="off">
+        </div>
+        <div id="userList" class="user-list"></div>
+      </aside>
+
+      <main class="chat">
+        <header class="chat-head">
+          <button id="backBtn" class="icon-btn mobile-only">‹</button>
+          <div class="avatar" id="chatAvatar">?</div>
+          <div class="chat-person">
+            <strong id="chatName">Select a user</strong>
+            <span id="presence">Choose someone to chat</span>
+          </div>
+        </header>
+
+        <div id="messages" class="messages">
+          <div class="empty">Select a person to start chatting 👋</div>
+        </div>
+
+        <div id="typing" class="typing hidden">typing…</div>
+
+        <div class="composer">
+          <input id="imageInput" type="file" accept="image/*" class="hidden">
+          <button id="imageBtn" class="icon-btn" title="Send image">🖼️</button>
+          <button id="recordBtn" class="icon-btn" title="Voice message">🎤</button>
+          <textarea id="messageInput" rows="1" placeholder="Write a message..." disabled></textarea>
+          <button id="sendBtn" class="send" disabled>➤</button>
+        </div>
+        <div id="uploadStatus" class="upload-status"></div>
+      </main>
+    </section>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

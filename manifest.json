@@ -1,0 +1,9 @@
+{
+  "name": "Messy Messenger",
+  "short_name": "Messy",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#080b10",
+  "theme_color": "#0b0f14",
+  "icons": []
+}
