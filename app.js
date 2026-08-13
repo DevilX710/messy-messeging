@@ -1,4 +1,4 @@
-import { supabase as sb } from './supabase.js'
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let me = null, selectedUser = null, channel = null, presenceChannel = null;
 let authMode = "login", mediaRecorder = null, audioChunks = [], typingTimer = null;
