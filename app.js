@@ -41,8 +41,12 @@ authForm.onsubmit=async e=>{
 async function boot(){
   const {data}=await sb.auth.getSession();
   if(data.session) await enter(data.session.user);
-  sb.auth.onAuthStateChange(async(_e,session)=>{
-    if(session) await enter(session.user); else location.reload();
+  sb.auth.onAuthStateChange(async(event,session)=>{
+    if(session) {
+      await enter(session.user);
+    } else if(event==="SIGNED_OUT") {
+      location.reload();
+    }
   });
 }
 async function enter(user){
