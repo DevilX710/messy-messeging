@@ -1,129 +1,180 @@
 /* =========================================================
-   MESSY — APP.JS
-   Dark social messenger
-   Supabase-compatible with existing database
+   MESSY APP.JS
+
+   PRIMARY TARGET:
+   iPhone 6 / iOS 12.5
+
+   Compatibility rules:
+   - No optional chaining ?.
+   - No nullish coalescing ??
+   - No crypto.randomUUID()
+   - No modern-only syntax
+   - Voice recording is feature detected
    ========================================================= */
 
-const sb = supabase.createClient(
+
+/* =========================================================
+   SUPABASE
+   ========================================================= */
+
+var sb = supabase.createClient(
   SUPABASE_URL,
   SUPABASE_ANON_KEY
 );
 
 
 /* =========================================================
-   STATE
+   GLOBAL STATE
    ========================================================= */
 
-let me = null;
-let selectedUser = null;
+var me = null;
+var selectedUser = null;
 
-let channel = null;
-let presenceChannel = null;
+var channel = null;
+var presenceChannel = null;
 
-let authMode = "login";
+var authMode = "login";
 
-let mediaRecorder = null;
-let audioChunks = [];
+var usersCache = [];
+var conversationCache = {};
 
-let typingTimer = null;
-let typingActive = false;
+var typingTimer = null;
+var typingActive = false;
 
-let usersCache = [];
-let conversationCache = {};
+var mediaRecorder = null;
+var audioChunks = [];
 
-let booted = false;
+var booted = false;
+var presenceTimer = null;
 
 
 /* =========================================================
-   HELPERS
+   DOM HELPERS
    ========================================================= */
 
-const $ = id => document.getElementById(id);
+function $(id) {
+  return document.getElementById(id);
+}
 
-const authView = $("authView");
-const chatView = $("chatView");
-const authForm = $("authForm");
 
-const userList = $("userList");
-const messages = $("messages");
-const messageInput = $("messageInput");
+var authView = $("authView");
+var chatView = $("chatView");
+
+var authForm = $("authForm");
+
+var userList = $("userList");
+
+var messages = $("messages");
+
+var messageInput = $("messageInput");
+
+
+/* =========================================================
+   BASIC HELPERS
+   ========================================================= */
 
 function initials(name) {
-  return (name || "?")
-    .trim()
-    .slice(0, 2)
+
+  var value = name || "?";
+
+  return value
+    .substring(0, 2)
     .toUpperCase();
 }
 
+
 function esc(value) {
-  return String(value ?? "").replace(
+
+  var s = String(
+    value == null ? "" : value
+  );
+
+  return s.replace(
     /[&<>"']/g,
-    char => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;"
-    }[char])
+    function(c) {
+
+      var map = {
+
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+
+      };
+
+      return map[c];
+    }
   );
 }
 
+
 function fmt(time) {
-  if (!time) return "";
 
-  return new Date(time).toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit"
-  });
-}
-
-function fmtListTime(time) {
-  if (!time) return "";
-
-  const date = new Date(time);
-  const now = new Date();
-
-  if (date.toDateString() === now.toDateString()) {
-    return date.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit"
-    });
+  if (!time) {
+    return "";
   }
 
-  return date.toLocaleDateString([], {
-    month: "short",
-    day: "numeric"
-  });
+  return new Date(time)
+    .toLocaleTimeString(
+      [],
+      {
+        hour: "2-digit",
+        minute: "2-digit"
+      }
+    );
 }
 
-function showError(message) {
+
+function setAuthMessage(text) {
+
   if ($("authMsg")) {
-    $("authMsg").textContent = message || "";
+
+    $("authMsg").textContent =
+      text || "";
   }
 }
 
-function showUploadStatus(message) {
+
+function setUploadStatus(text) {
+
   if ($("uploadStatus")) {
-    $("uploadStatus").textContent = message || "";
+
+    $("uploadStatus").textContent =
+      text || "";
   }
 }
 
-function setSendEnabled(enabled) {
-  if ($("sendBtn")) {
-    $("sendBtn").disabled = !enabled;
-  }
-
-  if (messageInput) {
-    messageInput.disabled = !enabled;
-  }
-}
 
 function scrollMessages() {
-  if (!messages) return;
 
-  requestAnimationFrame(() => {
-    messages.scrollTop = messages.scrollHeight;
-  });
+  if (!messages) {
+    return;
+  }
+
+  setTimeout(
+    function() {
+
+      messages.scrollTop =
+        messages.scrollHeight;
+
+    },
+    0
+  );
+}
+
+
+function randomName(prefix) {
+
+  return (
+    prefix +
+    "-" +
+    Date.now() +
+    "-" +
+    Math.floor(
+      Math.random() * 1000000
+    )
+  );
 }
 
 
@@ -131,142 +182,241 @@ function scrollMessages() {
    AUTH TABS
    ========================================================= */
 
-document.querySelectorAll(".tab").forEach(button => {
-  button.addEventListener("click", () => {
+var tabs =
+  document.querySelectorAll(".tab");
 
-    authMode = button.dataset.auth || "login";
 
-    document
-      .querySelectorAll(".tab")
-      .forEach(tab => {
-        tab.classList.toggle("active", tab === button);
-      });
+for (var i = 0; i < tabs.length; i++) {
 
-    if ($("username")) {
-      $("username").classList.toggle(
-        "hidden",
-        authMode !== "signup"
-      );
+  tabs[i].addEventListener(
+    "click",
+    function() {
+
+      authMode =
+        this.getAttribute(
+          "data-auth"
+        );
+
+
+      var allTabs =
+        document.querySelectorAll(
+          ".tab"
+        );
+
+
+      for (
+        var j = 0;
+        j < allTabs.length;
+        j++
+      ) {
+
+        allTabs[j].classList.toggle(
+          "active",
+          allTabs[j] === this
+        );
+
+      }
+
+
+      if ($("username")) {
+
+        $("username").classList.toggle(
+          "hidden",
+          authMode !== "signup"
+        );
+
+      }
+
+
+      if ($("authButton")) {
+
+        $("authButton").textContent =
+          authMode === "signup"
+            ? "Create account"
+            : "Log in";
+
+      }
+
+
+      if ($("password")) {
+
+        $("password").autocomplete =
+          authMode === "signup"
+            ? "new-password"
+            : "current-password";
+
+      }
+
+
+      setAuthMessage("");
+
     }
-
-    if ($("authButton")) {
-      $("authButton").textContent =
-        authMode === "signup"
-          ? "Create account"
-          : "Log in";
-    }
-
-    if ($("password")) {
-      $("password").autocomplete =
-        authMode === "signup"
-          ? "new-password"
-          : "current-password";
-    }
-
-    showError("");
-  });
-});
+  );
+}
 
 
 /* =========================================================
    AUTH
    ========================================================= */
 
-if (authForm) {
-  authForm.addEventListener("submit", async event => {
+authForm.addEventListener(
+  "submit",
+  async function(event) {
 
     event.preventDefault();
 
-    showError("Working…");
+    setAuthMessage(
+      "Working…"
+    );
 
-    const email = $("email")?.value.trim();
-    const password = $("password")?.value || "";
+
+    var email =
+      $("email").value.trim();
+
+    var password =
+      $("password").value;
+
 
     try {
 
       if (!email || !password) {
-        showError("Please enter your email and password.");
+
+        setAuthMessage(
+          "Please enter your email and password."
+        );
+
         return;
       }
+
+
+      /* LOGIN */
 
       if (authMode === "login") {
 
-        const { error } =
+        var loginResult =
           await sb.auth.signInWithPassword({
-            email,
-            password
+            email: email,
+            password: password
           });
 
-        if (error) {
-          showError(error.message);
+
+        if (loginResult.error) {
+
+          setAuthMessage(
+            loginResult.error.message
+          );
+
         }
 
         return;
       }
 
 
-      /* SIGN UP */
+      /* SIGNUP */
 
-      const username =
-        $("username")?.value.trim().toLowerCase();
+      var username =
+        $("username")
+          .value
+          .trim()
+          .toLowerCase();
 
-      if (!/^[a-z0-9_]{3,24}$/.test(username)) {
-        showError(
+
+      if (
+        !/^[a-z0-9_]{3,24}$/
+          .test(username)
+      ) {
+
+        setAuthMessage(
           "Username: 3–24 letters, numbers or _"
         );
+
         return;
       }
 
-      const {
-        data,
-        error
-      } = await sb.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            username
+
+      var signupResult =
+        await sb.auth.signUp({
+
+          email: email,
+
+          password: password,
+
+          options: {
+
+            data: {
+              username: username
+            }
+
           }
-        }
-      });
 
-      if (error) {
-        showError(error.message);
+        });
+
+
+      if (signupResult.error) {
+
+        setAuthMessage(
+          signupResult.error.message
+        );
+
         return;
       }
 
-      if (data?.user) {
 
-        const { error: profileError } =
-          await sb.from("profiles").upsert({
-            id: data.user.id,
-            username,
-            display_name: username
-          });
+      if (
+        signupResult.data &&
+        signupResult.data.user
+      ) {
 
-        if (profileError) {
-          console.error(
-            "Profile creation error:",
-            profileError
+        var profileResult =
+          await sb
+            .from("profiles")
+            .upsert({
+
+              id:
+                signupResult.data.user.id,
+
+              username:
+                username,
+
+              display_name:
+                username
+
+            });
+
+
+        if (profileResult.error) {
+
+          console.log(
+            "Profile creation:",
+            profileResult.error
           );
+
         }
+
       }
 
-      showError(
+
+      setAuthMessage(
         "Account created. Check your email if confirmation is enabled."
       );
 
+
     } catch (error) {
 
-      console.error(error);
+      console.log(error);
 
-      showError(
-        error?.message ||
-        "Something went wrong. Please try again."
+      setAuthMessage(
+
+        error && error.message
+          ? error.message
+          : "Something went wrong."
+
       );
+
     }
-  });
-}
+
+  }
+);
 
 
 /* =========================================================
@@ -275,66 +425,108 @@ if (authForm) {
 
 async function boot() {
 
-  if (booted) return;
+  if (booted) {
+    return;
+  }
 
   booted = true;
 
+
   try {
 
-    const { data, error } =
+    var sessionResult =
       await sb.auth.getSession();
 
-    if (error) {
-      console.error(error);
-      return;
+
+    if (
+      sessionResult.data &&
+      sessionResult.data.session &&
+      sessionResult.data.session.user
+    ) {
+
+      await enter(
+        sessionResult.data.session.user
+      );
+
     }
 
-    if (data.session?.user) {
-      await enter(data.session.user);
-    }
 
     sb.auth.onAuthStateChange(
-      async (event, session) => {
-
-        if (event === "SIGNED_OUT") {
-
-          me = null;
-          selectedUser = null;
-
-          if (channel) {
-            await sb.removeChannel(channel);
-            channel = null;
-          }
-
-          if (presenceChannel) {
-            await sb.removeChannel(
-              presenceChannel
-            );
-            presenceChannel = null;
-          }
-
-          location.reload();
-          return;
-        }
+      async function(
+        event,
+        session
+      ) {
 
         if (
-          session?.user &&
+          session &&
+          session.user &&
           (
             event === "SIGNED_IN" ||
             event === "INITIAL_SESSION"
           )
         ) {
-          await enter(session.user);
+
+          await enter(
+            session.user
+          );
+
         }
+
+
+        if (
+          event === "SIGNED_OUT"
+        ) {
+
+          me = null;
+
+          selectedUser = null;
+
+
+          if (channel) {
+
+            try {
+
+              await sb.removeChannel(
+                channel
+              );
+
+            } catch (e) {}
+
+            channel = null;
+
+          }
+
+
+          if (presenceChannel) {
+
+            try {
+
+              await sb.removeChannel(
+                presenceChannel
+              );
+
+            } catch (e) {}
+
+            presenceChannel = null;
+
+          }
+
+
+          window.location.reload();
+
+        }
+
       }
     );
 
+
   } catch (error) {
 
-    console.error(
+    console.log(
       "Boot error:",
       error
     );
+
   }
 }
 
@@ -345,75 +537,117 @@ async function boot() {
 
 async function enter(user) {
 
+  if (!user) {
+    return;
+  }
+
+
   me = user;
 
-  if (!authView || !chatView) return;
 
-  authView.classList.add("hidden");
-  chatView.classList.remove("hidden");
+  authView.classList.add(
+    "hidden"
+  );
+
+  chatView.classList.remove(
+    "hidden"
+  );
+
 
   try {
 
-    const {
-      data: profile,
-      error
-    } = await sb
-      .from("profiles")
-      .select("*")
-      .eq("id", user.id)
-      .single();
+    var profileResult =
+      await sb
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
 
-    if (error) {
-      console.error(
-        "Profile error:",
-        error
+
+    var profile =
+      profileResult.data;
+
+
+    $("meLabel").textContent =
+      "@" +
+      (
+        profile &&
+        profile.username
+          ? profile.username
+          : user.email
       );
-    }
 
-    if ($("meLabel")) {
-      $("meLabel").textContent =
-        "@" +
-        (
-          profile?.username ||
-          user.email ||
-          "user"
-        );
-    }
 
     await sb
       .from("profiles")
       .update({
+
         is_online: true,
-        last_seen: new Date().toISOString()
+
+        last_seen:
+          new Date().toISOString()
+
       })
-      .eq("id", user.id);
+      .eq(
+        "id",
+        user.id
+      );
+
 
     await loadUsers();
 
+
     setupPresence();
 
-    window.addEventListener(
-      "beforeunload",
-      () => {
 
-        if (!me) return;
+    if (presenceTimer) {
 
-        sb.from("profiles")
-          .update({
-            is_online: false,
-            last_seen: new Date().toISOString()
-          })
-          .eq("id", me.id);
-      }
-    );
+      clearInterval(
+        presenceTimer
+      );
+
+    }
+
+
+    presenceTimer =
+      setInterval(
+        updateMyPresence,
+        60000
+      );
+
 
   } catch (error) {
 
-    console.error(
+    console.log(
       "Enter error:",
       error
     );
+
   }
+}
+
+
+async function updateMyPresence() {
+
+  if (!me) {
+    return;
+  }
+
+
+  await sb
+    .from("profiles")
+    .update({
+
+      is_online: true,
+
+      last_seen:
+        new Date().toISOString()
+
+    })
+    .eq(
+      "id",
+      me.id
+    );
 }
 
 
@@ -421,56 +655,84 @@ async function enter(user) {
    LOAD USERS
    ========================================================= */
 
-async function loadUsers(query = "") {
+async function loadUsers(query) {
 
-  if (!me) return;
+  if (!me) {
+    return;
+  }
+
+
+  query = query || "";
+
 
   try {
 
-    let request = sb
-      .from("profiles")
-      .select(
-        "id,username,display_name,is_online,last_seen"
-      )
-      .neq("id", me.id)
-      .order("username");
+    var request =
+      sb
+        .from("profiles")
+        .select(
+          "id,username,display_name,is_online,last_seen"
+        )
+        .neq(
+          "id",
+          me.id
+        )
+        .order(
+          "username"
+        );
+
 
     if (query) {
-      request = request.ilike(
-        "username",
-        `%${query}%`
-      );
+
+      request =
+        request.ilike(
+          "username",
+          "%" +
+          query +
+          "%"
+        );
+
     }
 
-    const {
-      data,
-      error
-    } = await request;
 
-    if (error) {
-      console.error(
-        "User loading error:",
-        error
+    var result =
+      await request;
+
+
+    if (result.error) {
+
+      console.log(
+        result.error
       );
 
-      userList.innerHTML = `
-        <div class="empty">
-          Unable to load users.
-        </div>
-      `;
+
+      userList.innerHTML =
+        '<div class="empty-users">' +
+        'Unable to load users.' +
+        '</div>';
+
 
       return;
     }
 
-    usersCache = data || [];
+
+    usersCache =
+      result.data || [];
+
 
     await loadConversationPreviews();
 
-    renderUserList();
+
+    renderUsers();
+
 
   } catch (error) {
 
-    console.error(error);
+    console.log(
+      "loadUsers:",
+      error
+    );
+
   }
 }
 
@@ -483,368 +745,501 @@ async function loadConversationPreviews() {
 
   conversationCache = {};
 
-  if (!me || !usersCache.length) return;
+
+  if (!me) {
+    return;
+  }
+
 
   try {
 
-    const ids = usersCache.map(user => user.id);
+    var result =
+      await sb
+        .from("messages")
+        .select(
+          "id,sender_id,receiver_id,content,message_type,created_at,seen_at"
+        )
+        .or(
+          "sender_id.eq." +
+          me.id +
+          ",receiver_id.eq." +
+          me.id
+        )
+        .order(
+          "created_at",
+          {
+            ascending: false
+          }
+        );
 
-    const {
-      data,
-      error
-    } = await sb
-      .from("messages")
-      .select(
-        "id,sender_id,receiver_id,content,message_type,created_at,seen_at"
-      )
-      .or(
-        `sender_id.eq.${me.id},receiver_id.eq.${me.id}`
-      )
-      .order(
-        "created_at",
-        { ascending: false }
+
+    if (result.error) {
+
+      console.log(
+        "Preview error:",
+        result.error
       );
 
-    if (error) {
-      console.error(
-        "Conversation preview error:",
-        error
-      );
       return;
     }
 
-    for (const message of data || []) {
 
-      const otherId =
+    var list =
+      result.data || [];
+
+
+    for (
+      var i = 0;
+      i < list.length;
+      i++
+    ) {
+
+      var message =
+        list[i];
+
+
+      var otherId =
         message.sender_id === me.id
           ? message.receiver_id
           : message.sender_id;
 
-      if (!ids.includes(otherId)) {
-        continue;
-      }
 
-      if (!conversationCache[otherId]) {
+      if (
+        !conversationCache[otherId]
+      ) {
 
         conversationCache[otherId] = {
-          message,
-          unread: 0
+
+          message:
+            message,
+
+          unread:
+            0
+
         };
+
       }
+
 
       if (
         message.receiver_id === me.id &&
         !message.seen_at
       ) {
-        conversationCache[otherId].unread++;
+
+        conversationCache[
+          otherId
+        ].unread += 1;
+
       }
+
     }
+
 
   } catch (error) {
 
-    console.error(error);
+    console.log(
+      "Preview error:",
+      error
+    );
+
   }
 }
 
 
 /* =========================================================
-   RENDER USER / MESSAGE LIST
+   RENDER USER LIST
    ========================================================= */
 
-function renderUserList() {
+function renderUsers() {
 
-  if (!userList) return;
+  if (!userList) {
+    return;
+  }
+
 
   if (!usersCache.length) {
 
-    userList.innerHTML = `
-      <div class="empty">
-        <div style="
-          font-size:28px;
-          margin-bottom:10px;
-        ">👋</div>
-
-        No other users yet.
-      </div>
-    `;
+    userList.innerHTML =
+      '<div class="empty-users">' +
+      'No users found.' +
+      '</div>';
 
     return;
   }
 
-  userList.innerHTML =
-    usersCache.map(user => {
 
-      const preview =
-        conversationCache[user.id];
+  var html = "";
 
-      const lastMessage =
-        preview?.message;
 
-      let previewText =
-        lastMessage?.content || "";
+  for (
+    var i = 0;
+    i < usersCache.length;
+    i++
+  ) {
 
-      if (lastMessage?.message_type === "image") {
-        previewText = "📷 Photo";
-      }
+    var user =
+      usersCache[i];
 
-      if (lastMessage?.message_type === "audio") {
-        previewText = "🎤 Voice message";
-      }
 
-      if (!previewText) {
+    var preview =
+      conversationCache[
+        user.id
+      ];
+
+
+    var lastMessage =
+      preview
+        ? preview.message
+        : null;
+
+
+    var previewText =
+      "";
+
+
+    if (lastMessage) {
+
+      if (
+        lastMessage.message_type ===
+        "image"
+      ) {
+
         previewText =
-          user.is_online
-            ? "Active now"
-            : user.last_seen
-              ? "Last seen " +
-                fmtListTime(user.last_seen)
-              : "No messages yet";
+          "Photo";
+
+      } else if (
+        lastMessage.message_type ===
+        "audio"
+      ) {
+
+        previewText =
+          "Voice message";
+
+      } else {
+
+        previewText =
+          lastMessage.content || "";
+
       }
 
-      const unread =
-        preview?.unread || 0;
+    }
 
-      const active =
-        selectedUser?.id === user.id;
 
-      return `
-        <button
-          class="user ${active ? "active" : ""}"
-          data-id="${esc(user.id)}"
-          type="button"
-        >
+    if (!previewText) {
 
-          <div class="avatar">
-            ${esc(initials(user.username))}
-          </div>
+      previewText =
+        user.is_online
+          ? "Active now"
+          : "No messages yet";
 
-          <div class="user-info">
+    }
 
-            <strong>
-              @${esc(user.username)}
-            </strong>
 
-            <span>
-              <i class="dot ${
+    var unread =
+      preview
+        ? preview.unread
+        : 0;
+
+
+    var active =
+      selectedUser &&
+      selectedUser.id === user.id;
+
+
+    html +=
+
+      '<button type="button" ' +
+      'class="user ' +
+      (
+        active
+          ? "active"
+          : ""
+      ) +
+      '" data-id="' +
+      esc(user.id) +
+      '">' +
+
+
+        '<div class="avatar">' +
+          esc(
+            initials(
+              user.username
+            )
+          ) +
+        '</div>' +
+
+
+        '<div class="user-info">' +
+
+          '<strong>@' +
+            esc(
+              user.username
+            ) +
+          '</strong>' +
+
+
+          '<span>' +
+
+            '<i class="dot ' +
+              (
                 user.is_online
                   ? "online"
                   : ""
-              }"></i>
+              ) +
+            '"></i>' +
 
-              ${esc(previewText)}
-            </span>
+            esc(
+              previewText
+            ) +
 
-          </div>
+          '</span>' +
 
-          <div style="
-            margin-left:auto;
-            display:flex;
-            flex-direction:column;
-            align-items:flex-end;
-            gap:6px;
-            flex:none;
-          ">
+        '</div>' +
 
-            ${
-              lastMessage?.created_at
-                ? `
-                  <small style="
-                    color:#686370;
-                    font-size:9px;
-                  ">
-                    ${esc(
-                      fmtListTime(
-                        lastMessage.created_at
-                      )
-                    )}
-                  </small>
-                `
-                : ""
-            }
 
-            ${
-              unread > 0
-                ? `
-                  <span style="
-                    min-width:19px;
-                    height:19px;
-                    padding:0 5px;
-                    display:grid;
-                    place-items:center;
-                    border-radius:99px;
-                    color:white;
-                    background:#7657ff;
-                    font-size:9px;
-                    font-weight:800;
-                  ">
-                    ${
-                      unread > 99
-                        ? "99+"
-                        : unread
-                    }
-                  </span>
-                `
-                : ""
-            }
+        (
+          unread > 0
 
-          </div>
+            ?
 
-        </button>
-      `;
+            '<span style="' +
+              'margin-left:auto;' +
+              'min-width:19px;' +
+              'height:19px;' +
+              'padding:0 5px;' +
+              'border-radius:10px;' +
+              'display:inline-block;' +
+              'background:#7654f6;' +
+              'color:white;' +
+              'font-size:9px;' +
+              'font-weight:800;' +
+              'text-align:center;' +
+              'line-height:19px;' +
+            '">' +
 
-    }).join("");
+              (
+                unread > 99
+                  ? "99+"
+                  : unread
+              ) +
+
+            '</span>'
+
+            :
+
+            ""
+
+        ) +
+
+
+      '</button>';
+
+  }
+
+
+  userList.innerHTML =
+    html;
 }
 
 
 /* =========================================================
-   IMPORTANT:
-   RELIABLE USER CLICK HANDLER
+   USER CLICK
    ========================================================= */
 
-if (userList) {
+userList.addEventListener(
+  "click",
+  async function(event) {
 
-  userList.addEventListener(
-    "click",
-    async event => {
+    var target =
+      event.target;
 
-      const button =
-        event.target.closest(".user");
 
-      if (!button) return;
+    while (
+      target &&
+      target !== userList &&
+      !target.classList.contains(
+        "user"
+      )
+    ) {
 
-      const userId =
-        button.dataset.id;
+      target =
+        target.parentNode;
 
-      if (!userId) return;
+    }
 
-      const user =
-        usersCache.find(
-          item => item.id === userId
-        );
 
-      if (!user) {
-        console.warn(
-          "User not found:",
-          userId
-        );
-        return;
+    if (
+      !target ||
+      target === userList
+    ) {
+
+      return;
+    }
+
+
+    var id =
+      target.getAttribute(
+        "data-id"
+      );
+
+
+    if (!id) {
+      return;
+    }
+
+
+    var user = null;
+
+
+    for (
+      var i = 0;
+      i < usersCache.length;
+      i++
+    ) {
+
+      if (
+        usersCache[i].id === id
+      ) {
+
+        user =
+          usersCache[i];
+
+        break;
+
       }
 
-      await selectUser(user);
     }
-  );
-}
+
+
+    if (user) {
+
+      await selectUser(
+        user
+      );
+
+    }
+
+  }
+);
 
 
 /* =========================================================
    SEARCH
    ========================================================= */
 
-if ($("userSearch")) {
+$("userSearch").addEventListener(
+  "input",
+  function() {
 
-  let searchTimer = null;
+    var value =
+      this.value.trim();
 
-  $("userSearch").addEventListener(
-    "input",
-    event => {
 
-      clearTimeout(searchTimer);
+    loadUsers(
+      value
+    );
 
-      const query =
-        event.target.value.trim();
-
-      searchTimer = setTimeout(
-        () => loadUsers(query),
-        180
-      );
-    }
-  );
-}
+  }
+);
 
 
 /* =========================================================
-   SELECT USER / OPEN CHAT
+   OPEN CHAT
    ========================================================= */
 
 async function selectUser(user) {
 
-  if (!user || !me) return;
-
-  selectedUser = user;
-
-  $("chatName").textContent =
-    "@" + user.username;
-
-  $("chatAvatar").textContent =
-    initials(user.username);
-
-  updatePresenceText(user);
-
-  setSendEnabled(true);
-
-  $("typing")?.classList.add("hidden");
-
-  /* Mobile */
-
-  $("chatView")
-    ?.querySelector(".chat")
-    ?.classList.add("open");
-
-  $("chatView")
-    ?.querySelector(".sidebar")
-    ?.classList.add("hide-mobile");
-
-  /* Desktop visual update */
-
-  renderUserList();
-
-  try {
-
-    await loadMessages();
-
-    subscribeMessages();
-
-    subscribeTyping();
-
-  } catch (error) {
-
-    console.error(
-      "Select user error:",
-      error
-    );
-  }
-
-  messageInput?.focus();
-}
-
-
-/* =========================================================
-   PRESENCE TEXT
-   ========================================================= */
-
-function updatePresenceText(user) {
-
-  if (!$("presence")) return;
-
-  if (user.is_online) {
-
-    $("presence").innerHTML = `
-      <span style="
-        color:#39d98a;
-        font-weight:700;
-      ">
-        ●
-      </span>
-      online
-    `;
-
+  if (!user || !me) {
     return;
   }
 
-  $("presence").textContent =
+
+  selectedUser =
+    user;
+
+
+  $("chatName").textContent =
+    "@" +
+    user.username;
+
+
+  $("chatAvatar").textContent =
+    initials(
+      user.username
+    );
+
+
+  updatePresenceText(
+    user
+  );
+
+
+  messageInput.disabled =
+    false;
+
+
+  $("sendBtn").disabled =
+    false;
+
+
+  chatView
+    .querySelector(".chat")
+    .classList.add(
+      "open"
+    );
+
+
+  chatView
+    .querySelector(".sidebar")
+    .classList.add(
+      "hide-mobile"
+    );
+
+
+  renderUsers();
+
+
+  await loadMessages();
+
+
+  subscribeMessages();
+
+
+  subscribeTyping();
+
+
+  messageInput.focus();
+}
+
+
+function updatePresenceText(user) {
+
+  if (!user) {
+    return;
+  }
+
+
+  if (user.is_online) {
+
+    $("presence").innerHTML =
+      '<span style="color:#3edc8a;">●</span> online';
+
+  } else if (
     user.last_seen
-      ? "last seen " + fmt(user.last_seen)
-      : "offline";
+  ) {
+
+    $("presence").textContent =
+      "last seen " +
+      fmt(
+        user.last_seen
+      );
+
+  } else {
+
+    $("presence").textContent =
+      "offline";
+
+  }
 }
 
 
@@ -854,71 +1249,115 @@ function updatePresenceText(user) {
 
 async function loadMessages() {
 
-  if (!me || !selectedUser) return;
-
-  const {
-    data,
-    error
-  } = await sb
-    .from("messages")
-    .select("*")
-    .or(
-      `and(sender_id.eq.${me.id},receiver_id.eq.${selectedUser.id}),and(sender_id.eq.${selectedUser.id},receiver_id.eq.${me.id})`
-    )
-    .order(
-      "created_at",
-      { ascending: true }
-    );
-
-  if (error) {
-
-    console.error(
-      "Messages error:",
-      error
-    );
-
-    messages.innerHTML = `
-      <div class="empty">
-        Couldn't load messages.
-      </div>
-    `;
+  if (
+    !me ||
+    !selectedUser
+  ) {
 
     return;
   }
 
-  messages.innerHTML = "";
 
-  const list = data || [];
+  var result =
+    await sb
+      .from("messages")
+      .select("*")
+      .or(
+        "and(sender_id.eq." +
+        me.id +
+        ",receiver_id.eq." +
+        selectedUser.id +
+        "),and(sender_id.eq." +
+        selectedUser.id +
+        ",receiver_id.eq." +
+        me.id +
+        ")"
+      )
+      .order(
+        "created_at",
+        {
+          ascending: true
+        }
+      );
+
+
+  if (result.error) {
+
+    console.log(
+      "Messages error:",
+      result.error
+    );
+
+
+    messages.innerHTML =
+      '<div class="empty">' +
+        '<strong>' +
+          'Could not load messages.' +
+        '</strong>' +
+        '<span>' +
+          'Please try again.' +
+        '</span>' +
+      '</div>';
+
+
+    return;
+  }
+
+
+  messages.innerHTML =
+    "";
+
+
+  var list =
+    result.data || [];
+
 
   if (!list.length) {
 
-    messages.innerHTML = `
-      <div class="empty">
-        <div style="
-          font-size:27px;
-          margin-bottom:10px;
-        ">
-          ✨
-        </div>
+    messages.innerHTML =
+      '<div class="empty">' +
 
-        Start the conversation.
-      </div>
-    `;
+        '<div class="empty-icon">' +
+          '✦' +
+        '</div>' +
+
+        '<strong>' +
+          'Start the conversation' +
+        '</strong>' +
+
+        '<span>' +
+          'Send your first message.' +
+        '</span>' +
+
+      '</div>';
 
   } else {
 
-    list.forEach(renderMessage);
+    for (
+      var i = 0;
+      i < list.length;
+      i++
+    ) {
+
+      renderMessage(
+        list[i]
+      );
+
+    }
+
   }
+
 
   scrollMessages();
 
-  /* Mark received messages as seen */
 
   await sb
     .from("messages")
     .update({
+
       seen_at:
         new Date().toISOString()
+
     })
     .eq(
       "sender_id",
@@ -932,12 +1371,6 @@ async function loadMessages() {
       "seen_at",
       null
     );
-
-  /* Update sidebar */
-
-  await loadUsers(
-    $("userSearch")?.value.trim() || ""
-  );
 }
 
 
@@ -945,163 +1378,218 @@ async function loadMessages() {
    RENDER MESSAGE
    ========================================================= */
 
-function renderMessage(message) {
+function renderMessage(
+  message
+) {
 
-  if (!messages) return;
-
-  const mine =
-    message.sender_id === me.id;
-
-  const row =
-    document.createElement("div");
-
-  row.className =
-    "bubble-row " +
-    (mine ? "mine" : "");
-
-  let body = "";
-
-  if (message.message_type === "image") {
-
-    body = `
-      <img
-        src="${esc(message.file_url)}"
-        alt="Image"
-        loading="lazy"
-      >
-    `;
-
-  } else if (
-    message.message_type === "audio"
-  ) {
-
-    body = `
-      <audio
-        class="voice"
-        controls
-        preload="metadata"
-        src="${esc(message.file_url)}"
-      ></audio>
-    `;
-
-  } else {
-
-    body = esc(message.content);
+  if (!messages) {
+    return;
   }
 
 
-  row.innerHTML = `
-    <div class="bubble">
+  var mine =
+    message.sender_id === me.id;
 
-      ${body}
 
-      <div class="meta">
-        ${esc(fmt(message.created_at))}
+  var row =
+    document.createElement(
+      "div"
+    );
 
-        ${
+
+  row.className =
+    "bubble-row " +
+    (
+      mine
+        ? "mine"
+        : ""
+    );
+
+
+  row.setAttribute(
+    "data-message-id",
+    message.id
+  );
+
+
+  var body = "";
+
+
+  if (
+    message.message_type ===
+    "image"
+  ) {
+
+    body =
+      '<img src="' +
+      esc(
+        message.file_url
+      ) +
+      '" alt="Image">';
+
+  } else if (
+    message.message_type ===
+    "audio"
+  ) {
+
+    body =
+      '<audio class="voice" controls ' +
+      'preload="metadata" src="' +
+      esc(
+        message.file_url
+      ) +
+      '"></audio>';
+
+  } else {
+
+    body =
+      esc(
+        message.content
+      );
+
+  }
+
+
+  row.innerHTML =
+
+    '<div class="bubble">' +
+
+      body +
+
+      '<div class="meta">' +
+
+        esc(
+          fmt(
+            message.created_at
+          )
+        ) +
+
+        (
           mine
-            ? (
+
+            ?
+
+            (
               message.seen_at
                 ? " ✓✓"
                 : " ✓"
             )
-            : ""
-        }
-      </div>
 
-      <div class="reactionbar">
+            :
 
-        <button
-          class="reaction"
-          type="button"
-          data-react="❤️"
-          data-message="${esc(message.id)}"
-        >
-          ❤️
-        </button>
+            ""
+        ) +
 
-        <button
-          class="reaction"
-          type="button"
-          data-react="😂"
-          data-message="${esc(message.id)}"
-        >
-          😂
-        </button>
+      '</div>' +
 
-        <button
-          class="reaction"
-          type="button"
-          data-react="👍"
-          data-message="${esc(message.id)}"
-        >
-          👍
-        </button>
 
-        ${
+      '<div class="reactionbar">' +
+
+        '<button type="button" ' +
+        'class="reaction" ' +
+        'data-react="❤️">' +
+        '♥' +
+        '</button>' +
+
+        '<button type="button" ' +
+        'class="reaction" ' +
+        'data-react="😂">' +
+        '☺' +
+        '</button>' +
+
+        '<button type="button" ' +
+        'class="reaction" ' +
+        'data-react="👍">' +
+        '+' +
+        '</button>' +
+
+        (
           mine
-            ? `
-              <button
-                class="reaction"
-                type="button"
-                data-delete="${esc(message.id)}"
-              >
-                🗑️
-              </button>
-            `
-            : ""
-        }
 
-      </div>
+            ?
 
-    </div>
-  `;
+            '<button type="button" ' +
+            'class="reaction" ' +
+            'data-delete="1">' +
+            '×' +
+            '</button>'
+
+            :
+
+            ""
+        ) +
+
+      '</div>' +
+
+    '</div>';
 
 
-  /* Reaction buttons */
+  var reactions =
+    row.querySelectorAll(
+      "[data-react]"
+    );
 
-  row
-    .querySelectorAll("[data-react]")
-    .forEach(button => {
 
-      button.addEventListener(
-        "click",
-        async event => {
+  for (
+    var i = 0;
+    i < reactions.length;
+    i++
+  ) {
+
+    reactions[i].addEventListener(
+      "click",
+
+      (function(button) {
+
+        return function(event) {
 
           event.stopPropagation();
 
-          await react(
-            button.dataset.message,
-            button.dataset.react
+
+          react(
+            message.id,
+            button.getAttribute(
+              "data-react"
+            )
           );
-        }
-      );
-    });
+
+        };
+
+      })(reactions[i])
+
+    );
+
+  }
 
 
-  /* Delete */
-
-  const deleteButton =
+  var deleteButton =
     row.querySelector(
       "[data-delete]"
     );
+
 
   if (deleteButton) {
 
     deleteButton.addEventListener(
       "click",
-      async event => {
+      function(event) {
 
         event.stopPropagation();
 
-        await deleteMessage(
-          deleteButton.dataset.delete
+
+        deleteMessage(
+          message.id
         );
+
       }
     );
+
   }
 
-  messages.appendChild(row);
+
+  messages.appendChild(
+    row
+  );
 }
 
 
@@ -1111,38 +1599,59 @@ function renderMessage(message) {
 
 async function sendMessage(
   content,
-  type = "text",
-  file_url = null
+  type,
+  fileUrl
 ) {
 
-  if (!me || !selectedUser) return;
-
-  const cleanContent =
-    content || "";
-
-  const {
-    error
-  } = await sb
-    .from("messages")
-    .insert({
-      sender_id: me.id,
-      receiver_id: selectedUser.id,
-      content: cleanContent,
-      message_type: type,
-      file_url
-    });
-
-  if (error) {
-
-    console.error(
-      "Send message error:",
-      error
-    );
-
-    alert(error.message);
+  if (
+    !me ||
+    !selectedUser
+  ) {
 
     return false;
   }
+
+
+  type =
+    type || "text";
+
+
+  fileUrl =
+    fileUrl || null;
+
+
+  var result =
+    await sb
+      .from("messages")
+      .insert({
+
+        sender_id:
+          me.id,
+
+        receiver_id:
+          selectedUser.id,
+
+        content:
+          content || "",
+
+        message_type:
+          type,
+
+        file_url:
+          fileUrl
+
+      });
+
+
+  if (result.error) {
+
+    alert(
+      result.error.message
+    );
+
+    return false;
+  }
+
 
   return true;
 }
@@ -1152,137 +1661,187 @@ async function sendMessage(
    SEND BUTTON
    ========================================================= */
 
-if ($("sendBtn")) {
+$("sendBtn").addEventListener(
+  "click",
+  async function() {
 
-  $("sendBtn").addEventListener(
-    "click",
-    async () => {
+    var value =
+      messageInput.value.trim();
 
-      const value =
-        messageInput?.value.trim();
 
-      if (!value || !selectedUser) return;
+    if (
+      !value ||
+      !selectedUser
+    ) {
 
-      const sent =
-        await sendMessage(value);
-
-      if (sent) {
-
-        messageInput.value = "";
-
-        autoResizeTextarea();
-
-        stopTyping();
-      }
+      return;
     }
-  );
-}
+
+
+    var sent =
+      await sendMessage(
+        value,
+        "text",
+        null
+      );
+
+
+    if (sent) {
+
+      messageInput.value =
+        "";
+
+      autoResize();
+
+      stopTyping();
+
+    }
+
+  }
+);
 
 
 /* =========================================================
-   ENTER TO SEND
+   TEXT INPUT
    ========================================================= */
 
-if (messageInput) {
+messageInput.addEventListener(
+  "keydown",
+  function(event) {
 
-  messageInput.addEventListener(
-    "keydown",
-    event => {
+    if (
+      event.key === "Enter" &&
+      !event.shiftKey
+    ) {
 
-      if (
-        event.key === "Enter" &&
-        !event.shiftKey
-      ) {
+      event.preventDefault();
 
-        event.preventDefault();
+      $("sendBtn").click();
 
-        $("sendBtn")?.click();
-      }
     }
-  );
+
+  }
+);
 
 
-  messageInput.addEventListener(
-    "input",
-    () => {
+messageInput.addEventListener(
+  "input",
+  function() {
 
-      autoResizeTextarea();
+    autoResize();
 
-      if (
-        !selectedUser ||
-        !channel
-      ) {
-        return;
-      }
 
-      if (!typingActive) {
+    if (
+      !selectedUser ||
+      !channel
+    ) {
 
-        typingActive = true;
-
-        channel.send({
-          type: "broadcast",
-          event: "typing",
-          payload: {
-            user_id: me.id,
-            typing: true
-          }
-        });
-      }
-
-      clearTimeout(typingTimer);
-
-      typingTimer =
-        setTimeout(
-          stopTyping,
-          900
-        );
+      return;
     }
-  );
-}
 
 
-/* =========================================================
-   TEXTAREA AUTO RESIZE
-   ========================================================= */
+    if (!typingActive) {
 
-function autoResizeTextarea() {
+      typingActive =
+        true;
 
-  if (!messageInput) return;
 
-  messageInput.style.height = "auto";
+      channel.send({
+
+        type:
+          "broadcast",
+
+        event:
+          "typing",
+
+        payload: {
+
+          user_id:
+            me.id,
+
+          typing:
+            true
+
+        }
+
+      });
+
+    }
+
+
+    clearTimeout(
+      typingTimer
+    );
+
+
+    typingTimer =
+      setTimeout(
+        stopTyping,
+        900
+      );
+
+  }
+);
+
+
+function autoResize() {
 
   messageInput.style.height =
-    Math.min(
-      messageInput.scrollHeight,
-      120
-    ) + "px";
+    "auto";
+
+
+  var height =
+    messageInput.scrollHeight;
+
+
+  if (height > 112) {
+    height = 112;
+  }
+
+
+  messageInput.style.height =
+    height + "px";
 }
 
-
-/* =========================================================
-   STOP TYPING
-   ========================================================= */
 
 function stopTyping() {
 
-  clearTimeout(typingTimer);
+  clearTimeout(
+    typingTimer
+  );
+
 
   if (
     !typingActive ||
     !channel
   ) {
+
     return;
   }
 
-  typingActive = false;
+
+  typingActive =
+    false;
+
 
   channel.send({
-    type: "broadcast",
-    event: "typing",
+
+    type:
+      "broadcast",
+
+    event:
+      "typing",
+
     payload: {
-      user_id: me.id,
-      typing: false
+
+      user_id:
+        me.id,
+
+      typing:
+        false
+
     }
+
   });
 }
 
@@ -1293,177 +1852,250 @@ function stopTyping() {
 
 async function subscribeMessages() {
 
-  if (!me || !selectedUser) return;
+  if (
+    !me ||
+    !selectedUser
+  ) {
+
+    return;
+  }
+
 
   if (channel) {
 
     try {
-      await sb.removeChannel(channel);
-    } catch (error) {
-      console.warn(error);
-    }
 
-    channel = null;
+      await sb.removeChannel(
+        channel
+      );
+
+    } catch (e) {}
+
+
+    channel =
+      null;
   }
 
 
-  const room =
+  var room =
     "chat-" +
-    [me.id, selectedUser.id]
+    [
+      me.id,
+      selectedUser.id
+    ]
       .sort()
       .join("-");
 
 
   channel =
-    sb.channel(room);
+    sb.channel(
+      room
+    );
 
 
   channel.on(
-    "postgres_changes",
-    {
-      event: "INSERT",
-      schema: "public",
-      table: "messages"
-    },
-    async payload => {
 
-      const message =
+    "postgres_changes",
+
+    {
+
+      event:
+        "INSERT",
+
+      schema:
+        "public",
+
+      table:
+        "messages"
+
+    },
+
+    async function(payload) {
+
+      var message =
         payload.new;
 
-      const relevant =
+
+      if (!message) {
+        return;
+      }
+
+
+      var relevant =
+
         (
           message.sender_id === me.id &&
           message.receiver_id === selectedUser.id
-        ) ||
+        )
+
+        ||
+
         (
           message.sender_id === selectedUser.id &&
           message.receiver_id === me.id
         );
 
-      if (!relevant) return;
+
+      if (!relevant) {
+        return;
+      }
 
 
-      /* Don't duplicate our own messages */
+      var existing =
+        messages.querySelector(
+          '[data-message-id="' +
+          message.id +
+          '"]'
+        );
 
-      const existing =
-        [...messages.children]
-          .some(row => {
-
-            return row.dataset?.messageId ===
-              message.id;
-          });
 
       if (!existing) {
 
-        const oldEmpty =
+        var empty =
           messages.querySelector(
             ".empty"
           );
 
-        if (oldEmpty) {
-          oldEmpty.remove();
+
+        if (empty) {
+          messages.innerHTML = "";
         }
 
-        const before =
-          messages.children.length;
 
-        renderMessage(message);
+        renderMessage(
+          message
+        );
 
-        const row =
-          messages.lastElementChild;
 
-        if (row) {
-          row.dataset.messageId =
-            message.id;
-        }
+        scrollMessages();
 
-        if (before > 0) {
-          scrollMessages();
-        }
       }
 
 
-      /* Mark incoming message seen */
-
       if (
-        message.receiver_id === me.id
+        message.receiver_id ===
+        me.id
       ) {
 
         await sb
           .from("messages")
           .update({
+
             seen_at:
               new Date().toISOString()
+
           })
           .eq(
             "id",
             message.id
           );
+
       }
 
 
-      /* Refresh conversation list */
-
       await loadUsers(
-        $("userSearch")?.value.trim() || ""
+        $("userSearch")
+          .value
+          .trim()
       );
+
     }
   );
 
 
   channel.on(
-    "postgres_changes",
-    {
-      event: "UPDATE",
-      schema: "public",
-      table: "messages"
-    },
-    async () => {
 
-      await loadMessages();
+    "postgres_changes",
+
+    {
+
+      event:
+        "UPDATE",
+
+      schema:
+        "public",
+
+      table:
+        "messages"
+
+    },
+
+    function() {
+
+      if (selectedUser) {
+        loadMessages();
+      }
+
     }
+
   );
 
 
-  const status =
-    await channel.subscribe();
+  channel.subscribe(
+    function(status) {
 
-  console.log(
-    "Chat realtime:",
-    room,
-    status
+      console.log(
+        "Messy realtime:",
+        room,
+        status
+      );
+
+    }
   );
 }
 
 
 /* =========================================================
-   TYPING REALTIME
+   TYPING
    ========================================================= */
 
 function subscribeTyping() {
 
-  if (!channel || !selectedUser) return;
+  if (
+    !channel ||
+    !selectedUser
+  ) {
+
+    return;
+  }
+
 
   channel.on(
-    "broadcast",
-    {
-      event: "typing"
-    },
-    ({ payload }) => {
 
-      if (
-        payload?.user_id !==
-        selectedUser.id
-      ) {
+    "broadcast",
+
+    {
+      event:
+        "typing"
+    },
+
+    function(event) {
+
+      var payload =
+        event.payload;
+
+
+      if (!payload) {
         return;
       }
 
-      $("typing")
-        ?.classList.toggle(
-          "hidden",
-          !payload.typing
-        );
+
+      if (
+        payload.user_id !==
+        selectedUser.id
+      ) {
+
+        return;
+      }
+
+
+      $("typing").classList.toggle(
+        "hidden",
+        !payload.typing
+      );
+
     }
+
   );
 }
 
@@ -1474,109 +2106,647 @@ function subscribeTyping() {
 
 function setupPresence() {
 
-  if (!me) return;
+  if (!me) {
+    return;
+  }
+
 
   if (presenceChannel) {
 
-    sb.removeChannel(
-      presenceChannel
-    );
+    try {
 
-    presenceChannel = null;
+      sb.removeChannel(
+        presenceChannel
+      );
+
+    } catch (e) {}
+
+
+    presenceChannel =
+      null;
   }
 
 
   presenceChannel =
     sb.channel(
+
       "messy-presence",
+
       {
+
         config: {
+
           presence: {
-            key: me.id
+
+            key:
+              me.id
+
           }
+
         }
+
       }
+
     );
 
 
   presenceChannel.on(
-    "presence",
-    {
-      event: "sync"
-    },
-    async () => {
 
-      await loadUsers(
-        $("userSearch")?.value.trim() || ""
+    "presence",
+
+    {
+
+      event:
+        "sync"
+
+    },
+
+    function() {
+
+      loadUsers(
+        $("userSearch")
+          .value
+          .trim()
       );
 
-      if (selectedUser) {
-
-        const updated =
-          usersCache.find(
-            user =>
-              user.id ===
-              selectedUser.id
-          );
-
-        if (updated) {
-
-          selectedUser =
-            updated;
-
-          updatePresenceText(
-            updated
-          );
-        }
-      }
     }
+
   );
 
 
   presenceChannel.subscribe(
-    async status => {
 
-      if (status === "SUBSCRIBED") {
+    async function(status) {
+
+      if (
+        status ===
+        "SUBSCRIBED"
+      ) {
 
         await presenceChannel.track({
+
           online_at:
             new Date().toISOString()
+
         });
+
       }
+
     }
+
   );
 }
+
+
+/* =========================================================
+   LOGOUT
+   ========================================================= */
+
+$("logoutBtn").addEventListener(
+  "click",
+  async function() {
+
+    if (me) {
+
+      await sb
+        .from("profiles")
+        .update({
+
+          is_online:
+            false,
+
+          last_seen:
+            new Date().toISOString()
+
+        })
+        .eq(
+          "id",
+          me.id
+        );
+
+    }
+
+
+    await sb.auth.signOut();
+
+  }
+);
+
+
+/* =========================================================
+   MOBILE BACK
+   ========================================================= */
+
+$("backBtn").addEventListener(
+  "click",
+  function() {
+
+    chatView
+      .querySelector(".chat")
+      .classList.remove(
+        "open"
+      );
+
+
+    chatView
+      .querySelector(".sidebar")
+      .classList.remove(
+        "hide-mobile"
+      );
+
+
+    selectedUser =
+      null;
+
+
+    messageInput.disabled =
+      true;
+
+
+    $("sendBtn").disabled =
+      true;
+
+
+    $("chatName").textContent =
+      "Select a user";
+
+
+    $("chatAvatar").textContent =
+      "?";
+
+
+    $("presence").textContent =
+      "Choose someone to chat";
+
+
+    $("typing").classList.add(
+      "hidden"
+    );
+
+
+    messageInput.value =
+      "";
+
+
+    renderUsers();
+
+  }
+);
+
+
+/* =========================================================
+   IMAGE UPLOAD
+   ========================================================= */
+
+$("imageBtn").addEventListener(
+  "click",
+  function() {
+
+    if (!selectedUser) {
+
+      alert(
+        "Choose someone to chat with first."
+      );
+
+      return;
+    }
+
+
+    $("imageInput").click();
+
+  }
+);
+
+
+$("imageInput").addEventListener(
+  "change",
+  async function(event) {
+
+    var file =
+      event.target.files &&
+      event.target.files[0];
+
+
+    if (
+      !file ||
+      !selectedUser ||
+      !me
+    ) {
+
+      return;
+    }
+
+
+    try {
+
+      setUploadStatus(
+        "Uploading image…"
+      );
+
+
+      var safeName =
+        file.name.replace(
+          /[^a-zA-Z0-9._-]/g,
+          "_"
+        );
+
+
+      var path =
+        me.id +
+        "/" +
+        randomName(
+          "image"
+        ) +
+        "-" +
+        safeName;
+
+
+      var uploadResult =
+        await sb
+          .storage
+          .from("chat-media")
+          .upload(
+            path,
+            file,
+            {
+              contentType:
+                file.type
+            }
+          );
+
+
+      if (uploadResult.error) {
+
+        setUploadStatus(
+          uploadResult.error.message
+        );
+
+        return;
+      }
+
+
+      var publicResult =
+        sb
+          .storage
+          .from("chat-media")
+          .getPublicUrl(
+            path
+          );
+
+
+      var publicUrl =
+        publicResult.data &&
+        publicResult.data.publicUrl
+          ? publicResult.data.publicUrl
+          : null;
+
+
+      if (!publicUrl) {
+
+        setUploadStatus(
+          "Could not create image URL."
+        );
+
+        return;
+      }
+
+
+      await sendMessage(
+        "",
+        "image",
+        publicUrl
+      );
+
+
+      setUploadStatus("");
+
+
+    } catch (error) {
+
+      console.log(error);
+
+      setUploadStatus(
+        "Image upload failed."
+      );
+
+    } finally {
+
+      event.target.value =
+        "";
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   VOICE RECORDING
+   ========================================================= */
+
+function voiceRecordingSupported() {
+
+  return !!(
+    navigator.mediaDevices &&
+    navigator.mediaDevices.getUserMedia &&
+    window.MediaRecorder
+  );
+}
+
+
+if (
+  !voiceRecordingSupported()
+) {
+
+  $("recordBtn").disabled =
+    true;
+
+  $("recordBtn").title =
+    "Voice messages are unavailable on this older iPhone.";
+
+}
+
+
+$("recordBtn").addEventListener(
+  "click",
+  async function() {
+
+    if (
+      !voiceRecordingSupported()
+    ) {
+
+      alert(
+        "Voice recording is not supported by Safari on iOS 12.5."
+      );
+
+      return;
+    }
+
+
+    if (!selectedUser) {
+
+      alert(
+        "Choose someone to chat with first."
+      );
+
+      return;
+    }
+
+
+    if (
+      mediaRecorder &&
+      mediaRecorder.state ===
+      "recording"
+    ) {
+
+      mediaRecorder.stop();
+
+
+      $("recordBtn")
+        .classList
+        .remove(
+          "recording"
+        );
+
+
+      return;
+    }
+
+
+    try {
+
+      var stream =
+        await navigator
+          .mediaDevices
+          .getUserMedia({
+            audio: true
+          });
+
+
+      audioChunks =
+        [];
+
+
+      mediaRecorder =
+        new MediaRecorder(
+          stream
+        );
+
+
+      mediaRecorder.ondataavailable =
+        function(event) {
+
+          if (
+            event.data &&
+            event.data.size > 0
+          ) {
+
+            audioChunks.push(
+              event.data
+            );
+
+          }
+
+        };
+
+
+      mediaRecorder.onstop =
+        async function() {
+
+          stream
+            .getTracks()
+            .forEach(
+              function(track) {
+
+                track.stop();
+
+              }
+            );
+
+
+          try {
+
+            var mime =
+              mediaRecorder.mimeType ||
+              "audio/mp4";
+
+
+            var blob =
+              new Blob(
+                audioChunks,
+                {
+                  type: mime
+                }
+              );
+
+
+            if (!blob.size) {
+              return;
+            }
+
+
+            setUploadStatus(
+              "Uploading voice message…"
+            );
+
+
+            var extension =
+              mime.indexOf(
+                "mp4"
+              ) !== -1
+                ? "m4a"
+                : "webm";
+
+
+            var path =
+              me.id +
+              "/" +
+              randomName(
+                "voice"
+              ) +
+              "." +
+              extension;
+
+
+            var uploadResult =
+              await sb
+                .storage
+                .from("chat-media")
+                .upload(
+                  path,
+                  blob,
+                  {
+                    contentType:
+                      mime
+                  }
+                );
+
+
+            if (
+              uploadResult.error
+            ) {
+
+              setUploadStatus(
+                uploadResult.error.message
+              );
+
+              return;
+            }
+
+
+            var publicResult =
+              sb
+                .storage
+                .from("chat-media")
+                .getPublicUrl(
+                  path
+                );
+
+
+            var publicUrl =
+              publicResult.data &&
+              publicResult.data.publicUrl
+                ? publicResult.data.publicUrl
+                : null;
+
+
+            if (publicUrl) {
+
+              await sendMessage(
+                "",
+                "audio",
+                publicUrl
+              );
+
+            }
+
+
+            setUploadStatus("");
+
+
+          } catch (error) {
+
+            console.log(error);
+
+            setUploadStatus(
+              "Voice upload failed."
+            );
+
+          }
+
+        };
+
+
+      mediaRecorder.start();
+
+
+      $("recordBtn")
+        .classList
+        .add(
+          "recording"
+        );
+
+
+    } catch (error) {
+
+      console.log(error);
+
+      alert(
+        "Microphone permission was denied or is unavailable."
+      );
+
+    }
+
+  }
+);
 
 
 /* =========================================================
    DELETE MESSAGE
    ========================================================= */
 
-async function deleteMessage(id) {
+async function deleteMessage(
+  id
+) {
 
-  if (!id || !me) return;
+  if (!id || !me) {
+    return;
+  }
 
-  const confirmed =
-    confirm(
+
+  if (
+    !window.confirm(
       "Delete this message?"
-    );
-
-  if (!confirmed) return;
-
-  const {
-    error
-  } = await sb
-    .from("messages")
-    .delete()
-    .eq("id", id)
-    .eq("sender_id", me.id);
-
-  if (error) {
-
-    alert(error.message);
+    )
+  ) {
 
     return;
   }
+
+
+  var result =
+    await sb
+      .from("messages")
+      .delete()
+      .eq(
+        "id",
+        id
+      )
+      .eq(
+        "sender_id",
+        me.id
+      );
+
+
+  if (result.error) {
+
+    alert(
+      result.error.message
+    );
+
+    return;
+  }
+
 
   await loadMessages();
 }
@@ -1591,441 +2761,118 @@ async function react(
   reaction
 ) {
 
-  if (!messageId || !me) return;
+  if (
+    !messageId ||
+    !me
+  ) {
 
-  const {
-    error
-  } = await sb
-    .from("reactions")
-    .upsert(
-      {
-        message_id: messageId,
-        user_id: me.id,
-        reaction
-      },
-      {
-        onConflict:
-          "message_id,user_id"
-      }
-    );
+    return;
+  }
 
-  if (error) {
-    console.error(
+
+  var result =
+    await sb
+      .from("reactions")
+      .upsert(
+
+        {
+
+          message_id:
+            messageId,
+
+          user_id:
+            me.id,
+
+          reaction:
+            reaction
+
+        },
+
+        {
+
+          onConflict:
+            "message_id,user_id"
+
+        }
+
+      );
+
+
+  if (result.error) {
+
+    console.log(
       "Reaction error:",
-      error
+      result.error
     );
+
   }
 }
 
 
 /* =========================================================
-   LOGOUT
+   PAGE LIFECYCLE
    ========================================================= */
 
-if ($("logoutBtn")) {
+window.addEventListener(
+  "pagehide",
+  function() {
 
-  $("logoutBtn").addEventListener(
-    "click",
-    async () => {
-
-      try {
-
-        if (me) {
-
-          await sb
-            .from("profiles")
-            .update({
-              is_online: false,
-              last_seen:
-                new Date().toISOString()
-            })
-            .eq(
-              "id",
-              me.id
-            );
-        }
-
-        await sb.auth.signOut();
-
-      } catch (error) {
-
-        console.error(
-          "Logout error:",
-          error
-        );
-      }
+    if (!me) {
+      return;
     }
-  );
-}
 
 
-/* =========================================================
-   MOBILE BACK
-   ========================================================= */
+    sb
+      .from("profiles")
+      .update({
 
-if ($("backBtn")) {
+        is_online:
+          false,
 
-  $("backBtn").addEventListener(
-    "click",
-    () => {
+        last_seen:
+          new Date().toISOString()
 
-      $("chatView")
-        ?.querySelector(".chat")
-        ?.classList.remove("open");
+      })
+      .eq(
+        "id",
+        me.id
+      );
 
-      $("chatView")
-        ?.querySelector(".sidebar")
-        ?.classList.remove(
-          "hide-mobile"
-        );
-
-      selectedUser = null;
-
-      setSendEnabled(false);
-
-      if ($("chatName")) {
-        $("chatName").textContent =
-          "Select a user";
-      }
-
-      if ($("presence")) {
-        $("presence").textContent =
-          "Choose someone to chat";
-      }
-
-      if ($("chatAvatar")) {
-        $("chatAvatar").textContent = "?";
-      }
-
-      if (messageInput) {
-        messageInput.value = "";
-      }
-
-      $("typing")
-        ?.classList.add("hidden");
-    }
-  );
-}
-
-
-/* =========================================================
-   IMAGE UPLOAD
-   ========================================================= */
-
-if ($("imageBtn")) {
-
-  $("imageBtn").addEventListener(
-    "click",
-    () => {
-
-      if (!selectedUser) {
-        alert(
-          "Choose someone to chat with first."
-        );
-        return;
-      }
-
-      $("imageInput")?.click();
-    }
-  );
-}
-
-
-if ($("imageInput")) {
-
-  $("imageInput").addEventListener(
-    "change",
-    async event => {
-
-      const file =
-        event.target.files?.[0];
-
-      if (
-        !file ||
-        !selectedUser ||
-        !me
-      ) {
-        return;
-      }
-
-      try {
-
-        showUploadStatus(
-          "Uploading image…"
-        );
-
-        const safeName =
-          file.name.replace(
-            /[^a-zA-Z0-9._-]/g,
-            "_"
-          );
-
-        const path =
-          `${me.id}/${crypto.randomUUID()}-${safeName}`;
-
-
-        const {
-          error
-        } = await sb
-          .storage
-          .from("chat-media")
-          .upload(
-            path,
-            file,
-            {
-              contentType:
-                file.type
-            }
-          );
-
-        if (error) {
-
-          showUploadStatus(
-            error.message
-          );
-
-          return;
-        }
-
-
-        const {
-          data
-        } =
-          sb
-            .storage
-            .from("chat-media")
-            .getPublicUrl(path);
-
-
-        await sendMessage(
-          "",
-          "image",
-          data.publicUrl
-        );
-
-        showUploadStatus("");
-
-      } catch (error) {
-
-        console.error(error);
-
-        showUploadStatus(
-          "Image upload failed."
-        );
-
-      } finally {
-
-        event.target.value = "";
-      }
-    }
-  );
-}
-
-
-/* =========================================================
-   VOICE RECORDING
-   ========================================================= */
-
-if ($("recordBtn")) {
-
-  $("recordBtn").addEventListener(
-    "click",
-    async () => {
-
-      if (!selectedUser) {
-
-        alert(
-          "Choose someone to chat with first."
-        );
-
-        return;
-      }
-
-
-      /* STOP */
-
-      if (
-        mediaRecorder &&
-        mediaRecorder.state ===
-        "recording"
-      ) {
-
-        mediaRecorder.stop();
-
-        $("recordBtn")
-          .classList
-          .remove("recording");
-
-        return;
-      }
-
-
-      /* START */
-
-      try {
-
-        const stream =
-          await navigator
-            .mediaDevices
-            .getUserMedia({
-              audio: true
-            });
-
-
-        audioChunks = [];
-
-        mediaRecorder =
-          new MediaRecorder(stream);
-
-
-        mediaRecorder.ondataavailable =
-          event => {
-
-            if (
-              event.data &&
-              event.data.size > 0
-            ) {
-              audioChunks.push(
-                event.data
-              );
-            }
-          };
-
-
-        mediaRecorder.onstop =
-          async () => {
-
-            stream
-              .getTracks()
-              .forEach(
-                track =>
-                  track.stop()
-              );
-
-
-            try {
-
-              const blob =
-                new Blob(
-                  audioChunks,
-                  {
-                    type:
-                      mediaRecorder.mimeType ||
-                      "audio/webm"
-                  }
-                );
-
-
-              if (!blob.size) {
-
-                showUploadStatus("");
-
-                return;
-              }
-
-
-              showUploadStatus(
-                "Uploading voice message…"
-              );
-
-
-              const path =
-                `${me.id}/${crypto.randomUUID()}.webm`;
-
-
-              const {
-                error
-              } = await sb
-                .storage
-                .from("chat-media")
-                .upload(
-                  path,
-                  blob,
-                  {
-                    contentType:
-                      blob.type
-                  }
-                );
-
-
-              if (error) {
-
-                showUploadStatus(
-                  error.message
-                );
-
-                return;
-              }
-
-
-              const {
-                data
-              } =
-                sb
-                  .storage
-                  .from("chat-media")
-                  .getPublicUrl(path);
-
-
-              await sendMessage(
-                "",
-                "audio",
-                data.publicUrl
-              );
-
-
-              showUploadStatus("");
-
-            } catch (error) {
-
-              console.error(error);
-
-              showUploadStatus(
-                "Voice upload failed."
-              );
-            }
-          };
-
-
-        mediaRecorder.start();
-
-        $("recordBtn")
-          .classList
-          .add("recording");
-
-      } catch (error) {
-
-        console.error(error);
-
-        alert(
-          "Microphone permission was denied or is unavailable."
-        );
-      }
-    }
-  );
-}
+  }
+);
 
 
 /* =========================================================
    SERVICE WORKER
    ========================================================= */
 
-if ("serviceWorker" in navigator) {
+if (
+  "serviceWorker" in navigator
+) {
 
   window.addEventListener(
     "load",
-    () => {
+    function() {
 
-      navigator.serviceWorker
-        .register("sw.js")
-        .catch(error => {
-          console.warn(
-            "Service worker registration failed:",
-            error
-          );
-        });
+      navigator
+        .serviceWorker
+        .register(
+          "sw.js"
+        )
+        .catch(
+          function(error) {
+
+            console.log(
+              "Service worker unavailable:",
+              error
+            );
+
+          }
+        );
+
     }
   );
+
 }
 
 
