@@ -1,6 +1,5 @@
 /* =========================================================
-   MESSY â€” PREMIUM SOCIAL MESSENGER
-   Aesthetic UI refresh â€” keeps existing JS hooks/IDs intact
+   MESSY — PREMIUM SOCIAL MESSENGER
    ========================================================= */
 
 :root{
@@ -9,7 +8,6 @@
   --muted:#96919f;
   --line:rgba(32,25,48,.08);
   --white:rgba(255,255,255,.82);
-  --white-solid:#fff;
   --purple:#7657ff;
   --purple-dark:#6040ed;
   --lavender:#eae4ff;
@@ -19,40 +17,76 @@
   --soft-shadow:0 10px 30px rgba(51,36,91,.08);
 }
 
-*{box-sizing:border-box}
+*{
+  box-sizing:border-box;
+}
 
-html, body{
+html,
+body{
   margin:0;
   min-height:100%;
   color:var(--ink);
-  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,
+    BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
 
 body{
   min-height:100svh;
   overflow:hidden;
   background:
-    radial-gradient(circle at 8% 8%,rgba(118,87,255,.18),transparent 25%),
-    radial-gradient(circle at 92% 12%,rgba(255,139,184,.13),transparent 23%),
-    radial-gradient(circle at 80% 92%,rgba(118,87,255,.13),transparent 27%),
-    linear-gradient(135deg,#f8f7ff 0%,#f0edff 48%,#f8f2f7 100%);
+    radial-gradient(
+      circle at 8% 8%,
+      rgba(118,87,255,.18),
+      transparent 25%
+    ),
+    radial-gradient(
+      circle at 92% 12%,
+      rgba(255,139,184,.13),
+      transparent 23%
+    ),
+    radial-gradient(
+      circle at 80% 92%,
+      rgba(118,87,255,.13),
+      transparent 27%
+    ),
+    linear-gradient(
+      135deg,
+      #f8f7ff 0%,
+      #f0edff 48%,
+      #f8f2f7 100%
+    );
 }
 
-button, input, textarea{font:inherit}
-button{cursor:pointer}
-input, textarea{
+button,
+input,
+textarea{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+input,
+textarea{
   outline:none;
   border:1px solid transparent;
   color:var(--ink);
   background:#f4f2f8;
   transition:.2s ease;
 }
-input:focus, textarea:focus{
+
+input:focus,
+textarea:focus{
   background:#fff;
   border-color:rgba(118,87,255,.32);
   box-shadow:0 0 0 4px rgba(118,87,255,.08);
 }
-.hidden{display:none!important}
+
+.hidden{
+  display:none!important;
+}
+
 
 /* =========================================================
    AUTH
@@ -86,8 +120,7 @@ input:focus, textarea:focus{
   top:-100px;
   right:-70px;
   border-radius:50%;
-  background:rgba(118 87 .18);
-  filter:blur(3px)
+  background:rgba(118,87,255,.18);
 }
 
 .auth-card:after{
@@ -98,7 +131,7 @@ input:focus, textarea:focus{
   bottom:-80px;
   left:-40px;
   border-radius:50%;
-  background:rgba(255 139 .15);
+  background:rgba(255,139,184,.15);
 }
 
 .logo{
@@ -111,7 +144,13 @@ input:focus, textarea:focus{
   border-radius:24px;
   color:#fff;
   font-size:30px;
-  background:linear-gradient(135deg,#886cff 0%,#6848ed 55%,#ff82b1 130%);
+  background:
+    linear-gradient(
+      135deg,
+      #886cff 0%,
+      #6848ed 55%,
+      #ff82b1 130%
+    );
   box-shadow:0 18px 35px rgba(118,87,255,.28);
 }
 
@@ -130,7 +169,9 @@ input:focus, textarea:focus{
   line-height:1.5;
 }
 
-.muted{color:var(--muted)}
+.muted{
+  color:var(--muted);
+}
 
 .tabs{
   position:relative;
@@ -145,13 +186,13 @@ input:focus, textarea:focus{
 
 .tab{
   flex:1;
-  border:0px none;
+  border:0;
   padding:12px;
   border-radius:13px;
-  background:;
+  background:transparent;
   color:#9892a3;
   font-weight:750;
-  transition:.2s ease
+  transition:.2s ease;
 }
 
 .tab.active{
@@ -174,14 +215,14 @@ input:focus, textarea:focus{
 }
 
 .primary{
-  border:0px none;
+  border:0;
   padding:15px;
   border-radius:16px;
   color:#fff;
   font-weight:800;
-  background:#6645ed);
+  background:linear-gradient(110deg,#795aff,#6645ed);
   box-shadow:0 13px 28px rgba(105,72,237,.25);
-  transition:.2s ease
+  transition:.2s ease;
 }
 
 .primary:hover{
@@ -194,6 +235,7 @@ input:focus, textarea:focus{
   color:#e85c76;
 }
 
+
 /* =========================================================
    MAIN APP
    ========================================================= */
@@ -205,7 +247,11 @@ input:focus, textarea:focus{
   padding:22px;
 }
 
-/* Instagram-inspired left rail, but with its own identity */
+
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
+
 .sidebar{
   position:relative;
   width:355px;
@@ -242,12 +288,12 @@ input:focus, textarea:focus{
   font-size:11px;
 }
 
-/* floating compose/logout control */
 #logoutBtn{
-  border:0px none;
+  border:0;
   background:#f0edf8;
-  color:#6e667b
+  color:#6e667b;
 }
+
 #logoutBtn:hover{
   background:var(--lavender);
   color:var(--purple);
@@ -259,7 +305,7 @@ input:focus, textarea:focus{
 }
 
 .search-wrap:before{
-  content:"âŒ•";
+  content:"⌕";
   position:absolute;
   z-index:2;
   left:31px;
@@ -298,8 +344,14 @@ input:focus, textarea:focus{
 }
 
 .user.active{
-  background:linear-gradient(100deg,rgba(234,228,255,.95),rgba(246,242,255,.85));
-  box-shadow:inset 0 0 0 1px rgba(118,87,255,.07);
+  background:
+    linear-gradient(
+      100deg,
+      rgba(234,228,255,.95),
+      rgba(246,242,255,.85)
+    );
+  box-shadow:
+    inset 0 0 0 1px rgba(118,87,255,.07);
 }
 
 .avatar{
@@ -313,7 +365,12 @@ input:focus, textarea:focus{
   color:#fff;
   font-weight:850;
   background:
-    linear-gradient(145deg,#a48cff,#6848ed 62%,#ff8bb8);
+    linear-gradient(
+      145deg,
+      #a48cff,
+      #6848ed 62%,
+      #ff8bb8
+    );
   box-shadow:0 8px 20px rgba(118,87,255,.18);
 }
 
@@ -326,44 +383,67 @@ input:focus, textarea:focus{
   height:10px;
   border:2px solid #fff;
   border-radius:50%;
-  background:#c9c6d0
+  background:#c9c6d0;
 }
 
 .user:has(.dot.online) .avatar:after{
   background:var(--green);
 }
 
-.user-info{min-width:0}
-.user-info strong, .user-info span{
+.user-info{
+  min-width:0;
+}
+
+.user-info strong,
+.user-info span{
   display:block;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
 }
-.user-info strong{font-size:14px}
+
+.user-info strong{
+  font-size:14px;
+}
+
 .user-info span{
   margin-top:4px;
   color:#9a95a2;
   font-size:12px;
 }
 
+.dot{
+  display:inline-block;
+  width:7px;
+  height:7px;
+  margin-right:5px;
+  border-radius:50%;
+  background:#c9c6d0;
+}
+
+.dot.online{
+  background:var(--green);
+}
+
+
 /* =========================================================
-   CHAT AREA
+   CHAT
    ========================================================= */
 
 .chat{
-  border-right:.78) solid rgba(255; border-top:.78) solid rgba(255; border-bottom:.78) solid rgba(255; position:relative;
+  position:relative;
   flex:1;
   min-width:0;
   display:flex;
   flex-direction:column;
   overflow:hidden;
-  border-left:0px none;
+  border:1px solid rgba(255,255,255,.78);
+  border-left:0;
   border-radius:0 30px 30px 0;
-  background:rgba(255 255 .48);
+  background:rgba(255,255,255,.48);
   backdrop-filter:blur(28px);
   -webkit-backdrop-filter:blur(28px);
-  box-shadow:var(--shadow)
+  box-shadow:var(--shadow);
 }
 
 .chat:before{
@@ -374,11 +454,10 @@ input:focus, textarea:focus{
   top:-150px;
   right:-90px;
   border-radius:50%;
-  background:rgba(118 87 .10);
-  pointer-events:none
+  background:rgba(118,87,255,.10);
+  pointer-events:none;
 }
 
-/* top DM header */
 .chat-head{
   position:relative;
   z-index:1;
@@ -396,19 +475,31 @@ input:focus, textarea:focus{
   height:45px;
 }
 
-.chat-person{min-width:0}
-.chat-person strong, .chat-person span{display:block}
+.chat-person{
+  min-width:0;
+}
+
+.chat-person strong,
+.chat-person span{
+  display:block;
+}
+
 .chat-person strong{
   font-size:15px;
   letter-spacing:-.15px;
 }
+
 .chat-person span{
   margin-top:4px;
   color:#98929f;
   font-size:11px;
 }
 
-/* message stage */
+
+/* =========================================================
+   MESSAGES
+   ========================================================= */
+
 .messages{
   position:relative;
   z-index:1;
@@ -419,8 +510,16 @@ input:focus, textarea:focus{
   gap:6px;
   padding:26px clamp(18px,5vw,65px);
   background:
-    radial-gradient(circle at 18% 76%,rgba(255,139,184,.045),transparent 25%),
-    radial-gradient(circle at 76% 20%,rgba(118,87,255,.045),transparent 27%);
+    radial-gradient(
+      circle at 18% 76%,
+      rgba(255,139,184,.045),
+      transparent 25%
+    ),
+    radial-gradient(
+      circle at 76% 20%,
+      rgba(118,87,255,.045),
+      transparent 27%
+    );
 }
 
 .empty{
@@ -433,12 +532,11 @@ input:focus, textarea:focus{
 }
 
 .empty:before{
-  content:"âœ¦";
-  display:block;
+  content:"✦";
+  display:grid;
   width:54px;
   height:54px;
   margin:0 auto 13px;
-  display:grid;
   place-items:center;
   border-radius:19px;
   color:#fff;
@@ -453,11 +551,19 @@ input:focus, textarea:focus{
 }
 
 @keyframes messageIn{
-  from{opacity:0;transform:translateY(5px) scale(.985)}
-  to{opacity:1;transform:none}
+  from{
+    opacity:0;
+    transform:translateY(5px) scale(.985);
+  }
+  to{
+    opacity:1;
+    transform:none;
+  }
 }
 
-.bubble-row.mine{justify-content:flex-end}
+.bubble-row.mine{
+  justify-content:flex-end;
+}
 
 .bubble{
   max-width:min(68%,550px);
@@ -522,6 +628,7 @@ input:focus, textarea:focus{
   font-size:11px;
 }
 
+
 /* =========================================================
    COMPOSER
    ========================================================= */
@@ -551,11 +658,11 @@ input:focus, textarea:focus{
   width:44px;
   height:44px;
   flex:none;
-  border:0px none;
+  border:0;
   border-radius:15px;
   color:#77717f;
   background:#efedf5;
-  transition:.2s ease
+  transition:.2s ease;
 }
 
 .icon-btn:hover{
@@ -568,13 +675,13 @@ input:focus, textarea:focus{
   width:46px;
   height:44px;
   padding:0;
-  border:0px none;
+  border:0;
   border-radius:15px;
   color:#fff;
   font-weight:900;
-  background:#6848ed);
+  background:linear-gradient(135deg,#8062ff,#6848ed);
   box-shadow:0 9px 20px rgba(104,72,237,.22);
-  transition:.2s ease
+  transition:.2s ease;
 }
 
 .send:hover{
@@ -590,13 +697,25 @@ input:focus, textarea:focus{
   font-size:10px;
 }
 
-.mobile-only{display:none}
+.mobile-only{
+  display:none;
+}
+
 .recording{
   color:#fff!important;
-  background:linear-gradient(135deg,#ff6b7d,#ed5267)!important;
+  background:
+    linear-gradient(
+      135deg,
+      #ff6b7d,
+      #ed5267
+    )!important;
   box-shadow:0 9px 20px rgba(237,82,103,.20);
 }
-.voice{width:100%}
+
+.voice{
+  width:100%;
+}
+
 
 /* =========================================================
    SCROLLBARS
@@ -606,20 +725,31 @@ input:focus, textarea:focus{
   scrollbar-width:thin;
   scrollbar-color:#d6d1e0 transparent;
 }
-*::-webkit-scrollbar{width:6px;height:6px}
-*::-webkit-scrollbar-track{background:transparent}
+
+*::-webkit-scrollbar{
+  width:6px;
+  height:6px;
+}
+
+*::-webkit-scrollbar-track{
+  background:transparent;
+}
+
 *::-webkit-scrollbar-thumb{
   background:#d6d1e0;
   border-radius:99px;
 }
 
+
 /* =========================================================
-   MOBILE â€” FEELS LIKE A REAL SOCIAL APP
+   MOBILE
    ========================================================= */
 
 @media(max-width:700px){
 
-  body{overflow:hidden}
+  body{
+    overflow:hidden;
+  }
 
   #chatView{
     height:100svh;
@@ -629,30 +759,39 @@ input:focus, textarea:focus{
 
   .sidebar{
     width:100%;
-    border:0px none;
+    border:0;
     border-radius:0;
-    box-shadow:none
+    box-shadow:none;
   }
 
   .side-head{
     padding:23px 19px 13px;
   }
 
-  .side-head h2{font-size:28px}
+  .side-head h2{
+    font-size:28px;
+  }
 
   .chat{
     position:absolute;
     inset:0;
     display:none;
-    border:0px none;
+    border:0;
     border-radius:0;
-    box-shadow:none
+    box-shadow:none;
   }
 
-  .chat.open{display:flex}
+  .chat.open{
+    display:flex;
+  }
 
-  .sidebar.hide-mobile{display:none}
-  .mobile-only{display:block}
+  .sidebar.hide-mobile{
+    display:none;
+  }
+
+  .mobile-only{
+    display:block;
+  }
 
   .chat-head{
     min-height:72px;
@@ -663,7 +802,9 @@ input:focus, textarea:focus{
     padding:18px 12px;
   }
 
-  .bubble{max-width:84%}
+  .bubble{
+    max-width:84%;
+  }
 
   .composer{
     padding:9px 9px 11px;
