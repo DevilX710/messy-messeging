@@ -2,39 +2,84 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#f4f2ff">
-  <meta name="description" content="Messy — a private, aesthetic messenger.">
+
+  <!-- iPhone 6 / iOS 12.5 friendly viewport -->
+  <meta name="viewport"
+        content="width=device-width,
+                 initial-scale=1,
+                 maximum-scale=1,
+                 user-scalable=no,
+                 viewport-fit=cover">
+
+  <meta name="theme-color" content="#0b0a10">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Messy">
+
+  <link rel="icon" type="image/png" href="icon.png">
+  <link rel="apple-touch-icon" href="icon.png">
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="styles.css">
-  <title>Messy — Messages</title>
+
+  <title>Messy</title>
 </head>
 
 <body>
+
   <div id="app">
 
-    <!-- AUTH -->
+    <!-- ================= AUTH ================= -->
+
     <section id="authView" class="screen">
+
       <div class="auth-card">
 
-        <div class="logo">💬</div>
+        <div class="brand-lockup">
 
-        <h1>Messy</h1>
-        <p class="muted">Your private little corner to talk.</p>
+          <img
+            src="icon.png"
+            class="brand-icon"
+            alt="Messy">
 
-        <div class="tabs">
-          <button class="tab active" data-auth="login">Log in</button>
-          <button class="tab" data-auth="signup">Create account</button>
+          <div>
+            <h1>Messy</h1>
+            <p>Your private little messenger.</p>
+          </div>
+
         </div>
 
+
+        <div class="tabs">
+
+          <button
+            type="button"
+            class="tab active"
+            data-auth="login">
+            Log in
+          </button>
+
+          <button
+            type="button"
+            class="tab"
+            data-auth="signup">
+            Create account
+          </button>
+
+        </div>
+
+
         <form id="authForm">
+
           <input
             id="email"
             type="email"
             placeholder="Email"
             required
             autocomplete="email"
-          >
+            autocapitalize="none"
+            autocorrect="off"
+            spellcheck="false">
+
 
           <input
             id="password"
@@ -42,8 +87,8 @@
             placeholder="Password"
             required
             minlength="6"
-            autocomplete="current-password"
-          >
+            autocomplete="current-password">
+
 
           <input
             id="username"
@@ -52,128 +97,230 @@
             placeholder="Username"
             maxlength="24"
             autocomplete="nickname"
-          >
+            autocapitalize="none"
+            autocorrect="off"
+            spellcheck="false">
 
-          <button class="primary" type="submit" id="authButton">
+
+          <button
+            class="primary"
+            type="submit"
+            id="authButton">
             Log in
           </button>
+
         </form>
 
-        <p id="authMsg" class="error"></p>
+
+        <p
+          id="authMsg"
+          class="message-status">
+        </p>
+
       </div>
+
     </section>
 
 
-    <!-- MESSENGER -->
-    <section id="chatView" class="hidden">
+    <!-- ================= APP ================= -->
 
-      <!-- Conversations -->
+    <section
+      id="chatView"
+      class="app-shell hidden">
+
+
+      <!-- SIDEBAR -->
+
       <aside class="sidebar">
 
         <header class="side-head">
-          <div>
-            <h2>Messages</h2>
-            <span id="meLabel" class="muted"></span>
+
+          <div class="side-title">
+
+            <div class="mini-brand">
+              <img src="icon.png" alt="">
+            </div>
+
+            <div>
+              <h2>Messages</h2>
+              <span
+                id="meLabel"
+                class="muted">
+              </span>
+            </div>
+
           </div>
+
 
           <button
             id="logoutBtn"
-            class="icon-btn"
-            title="Log out"
-            aria-label="Log out"
-          >↪</button>
+            class="icon-btn logout-btn"
+            type="button"
+            aria-label="Log out">
+            ↪
+          </button>
+
         </header>
 
+
         <div class="search-wrap">
-          <input
-            id="userSearch"
-            placeholder="Search people..."
-            autocomplete="off"
-            aria-label="Search users"
-          >
+
+          <div class="search-box">
+
+            <span class="search-icon">
+              ⌕
+            </span>
+
+            <input
+              id="userSearch"
+              type="search"
+              placeholder="Search people..."
+              autocomplete="off"
+              autocapitalize="none"
+              autocorrect="off"
+              spellcheck="false">
+
+          </div>
+
         </div>
 
-        <div id="userList" class="user-list"></div>
+
+        <div
+          id="userList"
+          class="user-list">
+        </div>
 
       </aside>
 
 
-      <!-- Active conversation -->
+      <!-- CHAT -->
+
       <main class="chat">
+
 
         <header class="chat-head">
 
           <button
             id="backBtn"
             class="icon-btn mobile-only"
-            title="Back"
-            aria-label="Back to messages"
-          >‹</button>
+            type="button"
+            aria-label="Back">
+            ‹
+          </button>
 
-          <div class="avatar" id="chatAvatar">?</div>
+
+          <div
+            class="avatar chat-avatar"
+            id="chatAvatar">
+            ?
+          </div>
+
 
           <div class="chat-person">
-            <strong id="chatName">Select a user</strong>
-            <span id="presence">Choose someone to chat</span>
+
+            <strong id="chatName">
+              Select a user
+            </strong>
+
+            <span id="presence">
+              Choose someone to chat
+            </span>
+
           </div>
 
         </header>
 
 
-        <div id="messages" class="messages">
+        <div
+          id="messages"
+          class="messages">
+
           <div class="empty">
-            Select a person to start chatting 👋
+
+            <div class="empty-icon">
+              ✦
+            </div>
+
+            <strong>
+              Select a person
+            </strong>
+
+            <span>
+              Start a conversation on Messy.
+            </span>
+
           </div>
+
         </div>
 
 
-        <div id="typing" class="typing hidden">
+        <div
+          id="typing"
+          class="typing hidden">
           typing…
         </div>
 
 
-        <!-- Message composer -->
-        <div class="composer">
+        <div class="composer-area">
 
-          <input
-            id="imageInput"
-            type="file"
-            accept="image/*"
-            class="hidden"
-          >
+          <div
+            id="uploadStatus"
+            class="upload-status">
+          </div>
 
-          <button
-            id="imageBtn"
-            class="icon-btn"
-            title="Send image"
-            aria-label="Send image"
-          >🖼️</button>
 
-          <button
-            id="recordBtn"
-            class="icon-btn"
-            title="Voice message"
-            aria-label="Voice message"
-          >🎤</button>
+          <div class="composer">
 
-          <textarea
-            id="messageInput"
-            rows="1"
-            placeholder="Message..."
-            disabled
-            aria-label="Message"
-          ></textarea>
 
-          <button
-            id="sendBtn"
-            class="send"
-            disabled
-            aria-label="Send message"
-          >➤</button>
+            <input
+              id="imageInput"
+              type="file"
+              accept="image/*"
+              class="hidden">
+
+
+            <button
+              id="imageBtn"
+              class="icon-btn composer-btn"
+              type="button"
+              aria-label="Send image">
+              +
+            </button>
+
+
+            <button
+              id="recordBtn"
+              class="icon-btn composer-btn voice-btn"
+              type="button"
+              aria-label="Voice message">
+              ●
+            </button>
+
+
+            <textarea
+              id="messageInput"
+              rows="1"
+              placeholder="Message..."
+              disabled
+              autocapitalize="sentences"
+              autocorrect="on"
+              spellcheck="true">
+            </textarea>
+
+
+            <button
+              id="sendBtn"
+              class="send"
+              type="button"
+              disabled
+              aria-label="Send message">
+              ↑
+            </button>
+
+
+          </div>
 
         </div>
-
-        <div id="uploadStatus" class="upload-status"></div>
 
       </main>
 
@@ -181,8 +328,18 @@
 
   </div>
 
+
+  <!-- Supabase -->
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Your Supabase configuration -->
+
   <script src="config.js"></script>
+
+  <!-- Main application -->
+
   <script src="app.js"></script>
+
 </body>
 </html>
