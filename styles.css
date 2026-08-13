@@ -1194,3 +1194,76 @@ textarea:focus{
   }
 }
 ```
+/* =========================================================
+   MESSY LOGO FIX
+   Prevent the logo from taking over the sidebar
+   ========================================================= */
+
+.brand-icon {
+  width: 58px !important;
+  height: 58px !important;
+  max-width: 58px !important;
+  max-height: 58px !important;
+  object-fit: cover;
+  display: block;
+  flex-shrink: 0;
+}
+
+.mini-brand {
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px !important;
+  min-height: 42px !important;
+  border-radius: 13px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.mini-brand img {
+  width: 42px !important;
+  height: 42px !important;
+  max-width: 42px !important;
+  max-height: 42px !important;
+  object-fit: cover;
+  display: block;
+}
+
+/* Sidebar header must stay horizontal */
+.side-head {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px;
+}
+
+.side-title {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px;
+  min-width: 0;
+}
+
+/* Never let images inside the sidebar become huge */
+.sidebar img {
+  max-width: 42px !important;
+  max-height: 42px !important;
+}
+
+/* Keep the Messages text beside the icon */
+.side-title h2 {
+  margin: 0 !important;
+  line-height: 1.1;
+}
+
+.side-title .muted {
+  display: block;
+  margin-top: 5px;
+}
+
+/* The actual chat avatar stays circular */
+.chat-avatar {
+  width: 58px !important;
+  height: 58px !important;
+  min-width: 58px !important;
+  min-height: 58px !important;
+}
