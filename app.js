@@ -1,19 +1,14 @@
-import { supabase } from './supabase.js'
-const { createClient } = supabase;
-const sb = createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+import { supabase as sb } from './supabase.js'
 
 let me = null, selectedUser = null, channel = null, presenceChannel = null;
 let authMode = "login", mediaRecorder = null, audioChunks = [], typingTimer = null;
 const $ = id => document.getElementById(id);
-
 const authView=$("authView"), chatView=$("chatView"), authForm=$("authForm");
 const userList=$("userList"), messages=$("messages"), messageInput=$("messageInput");
-
 function initials(name){return (name||"?").slice(0,2).toUpperCase()}
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function fmt(t){return new Date(t).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})}
 function showError(s){$("authMsg").textContent=s||""}
-
 document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{
   authMode=b.dataset.auth;
   document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x===b));
@@ -22,7 +17,6 @@ document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{
   $("password").autocomplete=authMode==="signup"?"new-password":"current-password";
   showError("");
 });
-
 authForm.onsubmit=async e=>{
   e.preventDefault(); showError("Working…");
   const email=$("email").value.trim(), password=$("password").value;
@@ -38,7 +32,6 @@ authForm.onsubmit=async e=>{
     showError("Account created. Check your email if confirmation is enabled.");
   }
 };
-
 async function boot(){
   const {data}=await sb.auth.getSession();
   if(data.session) await enter(data.session.user);
@@ -74,7 +67,6 @@ async function loadUsers(query=""){
   userList.querySelectorAll(".user").forEach(b=>b.onclick=()=>selectUser(data.find(x=>x.id===b.dataset.id)));
 }
 $("userSearch").oninput=e=>loadUsers(e.target.value.trim());
-
 async function selectUser(u){
   selectedUser=u; $("chatName").textContent="@"+u.username; $("chatAvatar").textContent=initials(u.username);
   $("presence").textContent=u.is_online?"online":u.last_seen?"last seen "+fmt(u.last_seen):"offline";
@@ -117,7 +109,6 @@ messageInput.oninput=()=>{
   channel.send({type:"broadcast",event:"typing",payload:{user_id:me.id,typing:true}});
   clearTimeout(typingTimer); typingTimer=setTimeout(()=>channel.send({type:"broadcast",event:"typing",payload:{user_id:me.id,typing:false}}),900);
 };
-
 function subscribeMessages(){
   if(channel) sb.removeChannel(channel);
   channel=sb.channel("chat-"+[me.id,selectedUser.id].sort().join("-"));
@@ -147,7 +138,6 @@ async function deleteMessage(id){
 async function react(id,reaction){
   await sb.from("reactions").upsert({message_id:id,user_id:me.id,reaction},{onConflict:"message_id,user_id"});
 }
-
 $("logoutBtn").onclick=async()=>{
   await sb.from("profiles").update({is_online:false,last_seen:new Date().toISOString()}).eq("id",me.id);
   await sb.auth.signOut();
@@ -187,6 +177,5 @@ $("recordBtn").onclick=async()=>{
     mediaRecorder.start(); $("recordBtn").classList.add("recording");
   }catch(e){alert("Microphone permission was denied or is unavailable.")}
 };
-
 if("serviceWorker" in navigator) window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js"));
 boot();
