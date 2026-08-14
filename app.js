@@ -3108,3 +3108,1161 @@ boot();
   showTab("messages");
 
 })();
+/* =========================================================
+   MESSY V2 FEATURES
+   Tabs + Memes + Discover + Messy AI
+   iOS 12.5 compatible
+   ========================================================= */
+
+(function () {
+
+  /* ---------------------------------------------------------
+     TAB NAVIGATION
+     --------------------------------------------------------- */
+
+  var messagesTab = $("messagesTabBtn");
+  var memesTab = $("memesTabBtn");
+  var discoverTab = $("discoverTabBtn");
+  var aiTab = $("aiTabBtn");
+
+  var messagesPage = document.querySelector(".chat");
+  var memesPage = $("memesPage");
+  var discoverPage = $("discoverPage");
+  var aiPage = $("aiPage");
+
+  var sideTitle = $("sidePageTitle");
+  var peopleSearch = document.querySelector(".search-wrap");
+  var peopleList = $("userList");
+
+
+  function hidePages() {
+
+    if (messagesPage) {
+      messagesPage.classList.add("hidden");
+    }
+
+    if (memesPage) {
+      memesPage.classList.add("hidden");
+    }
+
+    if (discoverPage) {
+      discoverPage.classList.add("hidden");
+    }
+
+    if (aiPage) {
+      aiPage.classList.add("hidden");
+    }
+
+  }
+
+
+  function clearTabActive() {
+
+    var buttons =
+      document.querySelectorAll(".main-nav-item");
+
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].classList.remove("active");
+    }
+
+  }
+
+
+  function showTab(name) {
+
+    hidePages();
+    clearTabActive();
+
+
+    if (name === "messages") {
+
+      messagesPage.classList.remove("hidden");
+
+      messagesTab.classList.add("active");
+
+      if (sideTitle) {
+        sideTitle.textContent = "Messages";
+      }
+
+      if (peopleSearch) {
+        peopleSearch.classList.remove("hidden");
+      }
+
+      if (peopleList) {
+        peopleList.classList.remove("hidden");
+      }
+
+    }
+
+
+    if (name === "memes") {
+
+      memesPage.classList.remove("hidden");
+
+      memesTab.classList.add("active");
+
+      if (sideTitle) {
+        sideTitle.textContent = "Memes";
+      }
+
+      if (peopleSearch) {
+        peopleSearch.classList.add("hidden");
+      }
+
+      if (peopleList) {
+        peopleList.classList.add("hidden");
+      }
+
+      loadMemes("hot");
+
+    }
+
+
+    if (name === "discover") {
+
+      discoverPage.classList.remove("hidden");
+
+      discoverTab.classList.add("active");
+
+      if (sideTitle) {
+        sideTitle.textContent = "Discover";
+      }
+
+      if (peopleSearch) {
+        peopleSearch.classList.add("hidden");
+      }
+
+      if (peopleList) {
+        peopleList.classList.add("hidden");
+      }
+
+      loadDiscover();
+
+    }
+
+
+    if (name === "ai") {
+
+      aiPage.classList.remove("hidden");
+
+      aiTab.classList.add("active");
+
+      if (sideTitle) {
+        sideTitle.textContent = "Messy AI";
+      }
+
+      if (peopleSearch) {
+        peopleSearch.classList.add("hidden");
+      }
+
+      if (peopleList) {
+        peopleList.classList.add("hidden");
+      }
+
+      if ($("aiInput")) {
+        setTimeout(function () {
+          $("aiInput").focus();
+        }, 100);
+      }
+
+    }
+
+  }
+
+
+  if (messagesTab) {
+    messagesTab.addEventListener(
+      "click",
+      function () {
+        showTab("messages");
+      }
+    );
+  }
+
+
+  if (memesTab) {
+    memesTab.addEventListener(
+      "click",
+      function () {
+        showTab("memes");
+      }
+    );
+  }
+
+
+  if (discoverTab) {
+    discoverTab.addEventListener(
+      "click",
+      function () {
+        showTab("discover");
+      }
+    );
+  }
+
+
+  if (aiTab) {
+    aiTab.addEventListener(
+      "click",
+      function () {
+        showTab("ai");
+      }
+    );
+  }
+
+
+  /* ---------------------------------------------------------
+     MEMES
+     --------------------------------------------------------- */
+
+  var memeGrid = $("memeGrid");
+  var memeSearch = $("memeSearch");
+  var refreshMemes = $("refreshMemes");
+  var memeCategories = $("memeCategories");
+
+  var memeCache = [];
+
+
+  function memeCategoryUrl(category) {
+
+    var subreddit = "memes";
+
+    if (category === "funny") {
+      subreddit = "funny";
+    }
+
+    if (category === "reaction") {
+      subreddit = "reactionmemes";
+    }
+
+    if (category === "gaming") {
+      subreddit = "gamingmemes";
+    }
+
+    if (category === "random") {
+      subreddit = "memes";
+    }
+
+    return (
+      "https://meme-api.com/gimme/" +
+      subreddit +
+      "/20"
+    );
+
+  }
+
+
+  function renderMemes(list) {
+
+    if (!memeGrid) {
+      return;
+    }
+
+    memeGrid.innerHTML = "";
+
+
+    if (!list || !list.length) {
+
+      memeGrid.innerHTML =
+        '<div class="meme-empty">' +
+        "No memes found 😭" +
+        "</div>";
+
+      return;
+
+    }
+
+
+    for (var i = 0; i < list.length; i++) {
+
+      var meme = list[i];
+
+      if (!meme.url) {
+        continue;
+      }
+
+
+      var card =
+        document.createElement("article");
+
+      card.className = "meme-card";
+
+
+      card.innerHTML =
+        '<div class="meme-image-wrap">' +
+          '<img class="meme-image" ' +
+          'src="' + esc(meme.url) + '" ' +
+          'alt="' + esc(meme.title || "Meme") + '">' +
+        '</div>' +
+
+        '<div class="meme-info">' +
+
+          '<strong>' +
+            esc(meme.title || "Untitled meme") +
+          '</strong>' +
+
+          '<span>' +
+            "r/" +
+            esc(meme.subreddit || "memes") +
+          '</span>' +
+
+        '</div>';
+
+
+      memeGrid.appendChild(card);
+
+    }
+
+  }
+
+
+  async function loadMemes(category) {
+
+    if (!memeGrid) {
+      return;
+    }
+
+
+    memeGrid.innerHTML =
+      '<div class="meme-loading">' +
+      "Loading memes…" +
+      "</div>";
+
+
+    try {
+
+      var response =
+        await fetch(
+          memeCategoryUrl(category)
+        );
+
+
+      if (!response.ok) {
+        throw new Error("Meme API error");
+      }
+
+
+      var data =
+        await response.json();
+
+
+      memeCache =
+        data.memes || [];
+
+
+      renderMemes(memeCache);
+
+    } catch (error) {
+
+      console.log(
+        "Memes error:",
+        error
+      );
+
+
+      memeGrid.innerHTML =
+        '<div class="meme-empty">' +
+        "Couldn't load memes. Tap ↻ to retry." +
+        "</div>";
+
+    }
+
+  }
+
+
+  if (refreshMemes) {
+
+    refreshMemes.addEventListener(
+      "click",
+      function () {
+
+        var active =
+          memeCategories
+            ? memeCategories.querySelector(".chip.active")
+            : null;
+
+        var category =
+          active
+            ? active.getAttribute("data-category")
+            : "hot";
+
+        loadMemes(category);
+
+      }
+    );
+
+  }
+
+
+  if (memeCategories) {
+
+    var chips =
+      memeCategories.querySelectorAll(".chip");
+
+
+    for (var c = 0; c < chips.length; c++) {
+
+      chips[c].addEventListener(
+        "click",
+        function () {
+
+          for (
+            var j = 0;
+            j < chips.length;
+            j++
+          ) {
+            chips[j].classList.remove("active");
+          }
+
+
+          this.classList.add("active");
+
+
+          loadMemes(
+            this.getAttribute(
+              "data-category"
+            )
+          );
+
+        }
+      );
+
+    }
+
+  }
+
+
+  /* ---------------------------------------------------------
+     MEME SEARCH
+     --------------------------------------------------------- */
+
+  if (memeSearch) {
+
+    memeSearch.addEventListener(
+      "input",
+      function () {
+
+        var query =
+          this.value
+            .toLowerCase()
+            .trim();
+
+
+        if (!query) {
+
+          renderMemes(memeCache);
+
+          return;
+
+        }
+
+
+        var filtered = [];
+
+
+        for (
+          var i = 0;
+          i < memeCache.length;
+          i++
+        ) {
+
+          var item =
+            memeCache[i];
+
+
+          var title =
+            String(
+              item.title || ""
+            ).toLowerCase();
+
+
+          var subreddit =
+            String(
+              item.subreddit || ""
+            ).toLowerCase();
+
+
+          if (
+            title.indexOf(query) !== -1 ||
+            subreddit.indexOf(query) !== -1
+          ) {
+            filtered.push(item);
+          }
+
+        }
+
+
+        renderMemes(filtered);
+
+      }
+    );
+
+  }
+
+
+  /* ---------------------------------------------------------
+     DISCOVER
+     --------------------------------------------------------- */
+
+  var discoverSearch =
+    $("discoverSearch");
+
+  var suggestionList =
+    $("suggestionList");
+
+  var suggestionStatus =
+    $("suggestionStatus");
+
+  var myNetwork =
+    $("myNetwork");
+
+
+  async function loadDiscover(query) {
+
+    if (!me) {
+      return;
+    }
+
+
+    query = query || "";
+
+
+    if (suggestionStatus) {
+      suggestionStatus.textContent =
+        "Loading…";
+    }
+
+
+    try {
+
+      var request =
+        sb
+          .from("profiles")
+          .select(
+            "id,username,display_name,is_online,last_seen"
+          )
+          .neq(
+            "id",
+            me.id
+          )
+          .order("username")
+          .limit(30);
+
+
+      if (query) {
+
+        request =
+          request.ilike(
+            "username",
+            "%" + query + "%"
+          );
+
+      }
+
+
+      var result =
+        await request;
+
+
+      if (result.error) {
+        throw result.error;
+      }
+
+
+      var users =
+        result.data || [];
+
+
+      renderDiscoverUsers(users);
+
+
+      if (suggestionStatus) {
+
+        suggestionStatus.textContent =
+          users.length +
+          " people";
+
+      }
+
+
+      await loadNetworkCounts();
+
+    } catch (error) {
+
+      console.log(
+        "Discover error:",
+        error
+      );
+
+
+      if (suggestionStatus) {
+        suggestionStatus.textContent =
+          "Couldn't load people";
+      }
+
+    }
+
+  }
+
+
+  function renderDiscoverUsers(users) {
+
+    if (!suggestionList) {
+      return;
+    }
+
+
+    suggestionList.innerHTML = "";
+
+
+    if (!users.length) {
+
+      suggestionList.innerHTML =
+        '<div class="empty">' +
+        "No people found." +
+        "</div>";
+
+      return;
+
+    }
+
+
+    for (var i = 0; i < users.length; i++) {
+
+      var user =
+        users[i];
+
+
+      var row =
+        document.createElement("div");
+
+      row.className =
+        "discover-user";
+
+
+      row.innerHTML =
+
+        '<div class="avatar">' +
+          esc(
+            initials(
+              user.username
+            )
+          ) +
+        '</div>' +
+
+        '<div class="discover-user-info">' +
+
+          '<strong>@' +
+            esc(user.username) +
+          '</strong>' +
+
+          '<span>' +
+            esc(
+              user.display_name ||
+              user.username
+            ) +
+          '</span>' +
+
+        '</div>' +
+
+        '<button ' +
+        'type="button" ' +
+        'class="follow-btn" ' +
+        'data-follow-id="' +
+        esc(user.id) +
+        '">' +
+        "Follow" +
+        "</button>";
+
+
+      suggestionList.appendChild(row);
+
+    }
+
+
+    var buttons =
+      suggestionList.querySelectorAll(
+        "[data-follow-id]"
+      );
+
+
+    for (var j = 0; j < buttons.length; j++) {
+
+      buttons[j].addEventListener(
+        "click",
+        function () {
+
+          toggleFollow(
+            this.getAttribute(
+              "data-follow-id"
+            ),
+            this
+          );
+
+        }
+      );
+
+    }
+
+  }
+
+
+  async function toggleFollow(userId, button) {
+
+    if (!me || !userId) {
+      return;
+    }
+
+
+    button.disabled = true;
+
+
+    try {
+
+      var existing =
+        await sb
+          .from("follows")
+          .select("id")
+          .eq(
+            "follower_id",
+            me.id
+          )
+          .eq(
+            "following_id",
+            userId
+          )
+          .maybeSingle();
+
+
+      if (existing.data) {
+
+        var remove =
+          await sb
+            .from("follows")
+            .delete()
+            .eq(
+              "id",
+              existing.data.id
+            );
+
+
+        if (remove.error) {
+          throw remove.error;
+        }
+
+
+        button.textContent =
+          "Follow";
+
+      } else {
+
+        var add =
+          await sb
+            .from("follows")
+            .insert({
+              follower_id: me.id,
+              following_id: userId
+            });
+
+
+        if (add.error) {
+          throw add.error;
+        }
+
+
+        button.textContent =
+          "Following";
+
+      }
+
+
+      await loadNetworkCounts();
+
+    } catch (error) {
+
+      console.log(
+        "Follow error:",
+        error
+      );
+
+
+      alert(
+        error.message ||
+        "Couldn't update follow."
+      );
+
+    }
+
+
+    button.disabled = false;
+
+  }
+
+
+  async function loadNetworkCounts() {
+
+    if (!me || !myNetwork) {
+      return;
+    }
+
+
+    try {
+
+      var followers =
+        await sb
+          .from("follows")
+          .select(
+            "id",
+            {
+              count: "exact",
+              head: true
+            }
+          )
+          .eq(
+            "following_id",
+            me.id
+          );
+
+
+      var following =
+        await sb
+          .from("follows")
+          .select(
+            "id",
+            {
+              count: "exact",
+              head: true
+            }
+          )
+          .eq(
+            "follower_id",
+            me.id
+          );
+
+
+      myNetwork.innerHTML =
+
+        '<div class="network-stat">' +
+          '<strong>' +
+            (followers.count || 0) +
+          '</strong>' +
+          '<span>Followers</span>' +
+        '</div>' +
+
+        '<div class="network-stat">' +
+          '<strong>' +
+            (following.count || 0) +
+          '</strong>' +
+          '<span>Following</span>' +
+        '</div>';
+
+    } catch (error) {
+
+      console.log(
+        "Network error:",
+        error
+      );
+
+    }
+
+  }
+
+
+  if (discoverSearch) {
+
+    discoverSearch.addEventListener(
+      "input",
+      function () {
+
+        loadDiscover(
+          this.value.trim()
+        );
+
+      }
+    );
+
+  }
+
+
+  /* ---------------------------------------------------------
+     MESSY AI
+     --------------------------------------------------------- */
+
+  var aiInput =
+    $("aiInput");
+
+  var aiSend =
+    $("aiSend");
+
+  var aiMessages =
+    $("aiMessages");
+
+  var aiStatus =
+    $("aiStatus");
+
+  var clearAi =
+    $("clearAi");
+
+
+  var aiHistory = [];
+
+
+  function addAiMessage(text, role) {
+
+    if (!aiMessages) {
+      return;
+    }
+
+
+    var row =
+      document.createElement("div");
+
+
+    row.className =
+      "ai-message " +
+      (
+        role === "user"
+          ? "ai-user"
+          : "ai-assistant"
+      );
+
+
+    row.textContent =
+      text;
+
+
+    aiMessages.appendChild(row);
+
+
+    aiMessages.scrollTop =
+      aiMessages.scrollHeight;
+
+  }
+
+
+  async function sendAiMessage() {
+
+    if (!aiInput) {
+      return;
+    }
+
+
+    var text =
+      aiInput.value.trim();
+
+
+    if (!text) {
+      return;
+    }
+
+
+    aiInput.value = "";
+
+
+    addAiMessage(
+      text,
+      "user"
+    );
+
+
+    aiHistory.push({
+      role: "user",
+      content: text
+    });
+
+
+    if (aiStatus) {
+      aiStatus.textContent =
+        "Messy AI is thinking…";
+    }
+
+
+    if (aiSend) {
+      aiSend.disabled = true;
+    }
+
+
+    try {
+
+      /*
+       * IMPORTANT:
+       * Your screenshot showed the Edge Function
+       * name as "dynamic-handler".
+       */
+
+      var result =
+        await sb.functions.invoke(
+          "dynamic-handler",
+          {
+            body: {
+              messages: aiHistory
+            }
+          }
+        );
+
+
+      if (result.error) {
+        throw result.error;
+      }
+
+
+      var data =
+        result.data;
+
+
+      var reply = "";
+
+
+      if (typeof data === "string") {
+
+        reply = data;
+
+      } else if (
+        data &&
+        data.reply
+      ) {
+
+        reply =
+          data.reply;
+
+      } else if (
+        data &&
+        data.message
+      ) {
+
+        reply =
+          data.message;
+
+      } else if (
+        data &&
+        data.content
+      ) {
+
+        reply =
+          data.content;
+
+      } else {
+
+        reply =
+          "Messy AI returned an empty response.";
+
+      }
+
+
+      addAiMessage(
+        reply,
+        "assistant"
+      );
+
+
+      aiHistory.push({
+        role: "assistant",
+        content: reply
+      });
+
+
+      if (aiStatus) {
+        aiStatus.textContent = "";
+      }
+
+    } catch (error) {
+
+      console.log(
+        "Messy AI error:",
+        error
+      );
+
+
+      addAiMessage(
+        "I couldn't connect to Messy AI right now. Check the Edge Function.",
+        "assistant"
+      );
+
+
+      if (aiStatus) {
+        aiStatus.textContent =
+          error.message ||
+          "AI request failed.";
+      }
+
+    }
+
+
+    if (aiSend) {
+      aiSend.disabled = false;
+    }
+
+  }
+
+
+  if (aiSend) {
+
+    aiSend.addEventListener(
+      "click",
+      sendAiMessage
+    );
+
+  }
+
+
+  if (aiInput) {
+
+    aiInput.addEventListener(
+      "keydown",
+      function (event) {
+
+        if (
+          event.key === "Enter" &&
+          !event.shiftKey
+        ) {
+
+          event.preventDefault();
+
+          sendAiMessage();
+
+        }
+
+      }
+    );
+
+  }
+
+
+  if (clearAi) {
+
+    clearAi.addEventListener(
+      "click",
+      function () {
+
+        aiHistory = [];
+
+
+        if (aiMessages) {
+
+          aiMessages.innerHTML =
+            '<div class="ai-welcome">' +
+              '<div class="ai-orb">🤖</div>' +
+              '<strong>Hey, I\'m Messy AI.</strong>' +
+              '<span>Ask me anything, brainstorm, rewrite a message, or get a caption.</span>' +
+            '</div>';
+
+        }
+
+
+        if (aiStatus) {
+          aiStatus.textContent = "";
+        }
+
+      }
+    );
+
+  }
+
+
+  /*
+   * Keep Messages as the first page.
+   */
+
+  showTab("messages");
+
+
+})();
