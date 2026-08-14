@@ -1,345 +1,721 @@
 <!doctype html>
 <html lang="en">
+
 <head>
+
   <meta charset="utf-8">
 
-  <!-- iPhone 6 / iOS 12.5 friendly viewport -->
-  <meta name="viewport"
-        content="width=device-width,
-                 initial-scale=1,
-                 maximum-scale=1,
-                 user-scalable=no,
-                 viewport-fit=cover">
+  <!-- iPhone 6 / iOS 12.5 -->
+  <meta
+    name="viewport"
+    content="width=device-width,
+             initial-scale=1,
+             maximum-scale=1,
+             user-scalable=no,
+             viewport-fit=cover">
 
   <meta name="theme-color" content="#0b0a10">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Messy">
 
-  <link rel="icon" type="image/png" href="icon.png">
-  <link rel="apple-touch-icon" href="icon.png">
-  <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="styles.css">
+  <meta
+    name="apple-mobile-web-app-capable"
+    content="yes">
+
+  <meta
+    name="apple-mobile-web-app-status-bar-style"
+    content="black-translucent">
+
+  <meta
+    name="apple-mobile-web-app-title"
+    content="Messy">
+
+  <link
+    rel="icon"
+    type="image/png"
+    href="icon.png">
+
+  <link
+    rel="apple-touch-icon"
+    href="icon.png">
+
+  <link
+    rel="manifest"
+    href="manifest.json">
+
+  <link
+    rel="stylesheet"
+    href="styles.css">
 
   <title>Messy</title>
+
 </head>
+
 
 <body>
 
-  <div id="app">
-
-    <!-- ================= AUTH ================= -->
-
-    <section id="authView" class="screen">
-
-      <div class="auth-card">
-
-        <div class="brand-lockup">
-
-          <img
-            src="icon.png"
-            class="brand-icon"
-            alt="Messy">
-
-          <div>
-            <h1>Messy</h1>
-            <p>Your private little messenger.</p>
-          </div>
-
-        </div>
+<div id="app">
 
 
-        <div class="tabs">
+  <!-- =====================================================
+       AUTH
+       ===================================================== -->
 
-          <button
-            type="button"
-            class="tab active"
-            data-auth="login">
-            Log in
-          </button>
+  <section
+    id="authView"
+    class="screen">
 
-          <button
-            type="button"
-            class="tab"
-            data-auth="signup">
-            Create account
-          </button>
+    <div class="auth-card">
+
+
+      <!-- BRAND -->
+
+      <div class="brand-lockup">
+
+        <img
+          src="icon.png"
+          class="brand-icon"
+          alt="Messy">
+
+        <div>
+
+          <h1>Messy</h1>
+
+          <p>
+            Your private little messenger.
+          </p>
 
         </div>
-
-
-        <form id="authForm">
-
-          <input
-            id="email"
-            type="email"
-            placeholder="Email"
-            required
-            autocomplete="email"
-            autocapitalize="none"
-            autocorrect="off"
-            spellcheck="false">
-
-
-          <input
-            id="password"
-            type="password"
-            placeholder="Password"
-            required
-            minlength="6"
-            autocomplete="current-password">
-
-
-          <input
-            id="username"
-            class="signup-only hidden"
-            type="text"
-            placeholder="Username"
-            maxlength="24"
-            autocomplete="nickname"
-            autocapitalize="none"
-            autocorrect="off"
-            spellcheck="false">
-
-
-          <button
-            class="primary"
-            type="submit"
-            id="authButton">
-            Log in
-          </button>
-
-        </form>
-
-
-        <p
-          id="authMsg"
-          class="message-status">
-        </p>
 
       </div>
 
-    </section>
+
+      <!-- AUTH TABS -->
+
+      <div class="tabs">
+
+        <button
+          type="button"
+          class="tab active"
+          data-auth="login">
+
+          Log in
+
+        </button>
 
 
-    <!-- ================= APP ================= -->
+        <button
+          type="button"
+          class="tab"
+          data-auth="signup">
+
+          Create account
+
+        </button>
+
+      </div>
+
+
+      <!-- AUTH FORM -->
+
+      <form id="authForm">
+
+
+        <input
+          id="email"
+          type="email"
+          placeholder="Email"
+          required
+          autocomplete="email"
+          autocapitalize="none"
+          autocorrect="off"
+          spellcheck="false">
+
+
+        <input
+          id="password"
+          type="password"
+          placeholder="Password"
+          required
+          minlength="6"
+          autocomplete="current-password">
+
+
+        <input
+          id="username"
+          class="signup-only hidden"
+          type="text"
+          placeholder="Username"
+          maxlength="24"
+          autocomplete="nickname"
+          autocapitalize="none"
+          autocorrect="off"
+          spellcheck="false">
+
+
+        <button
+          class="primary"
+          type="submit"
+          id="authButton">
+
+          Log in
+
+        </button>
+
+      </form>
+
+
+      <p
+        id="authMsg"
+        class="message-status">
+      </p>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- =====================================================
+       MAIN APP
+       ===================================================== -->
+
+  <section
+    id="chatView"
+    class="app-shell hidden">
+
+
+    <!-- ===================================================
+         SIDEBAR
+         =================================================== -->
+
+    <aside class="sidebar">
+
+
+      <!-- SIDEBAR HEADER -->
+
+      <header class="side-head">
+
+        <div class="side-title">
+
+          <div class="mini-brand">
+
+            <img
+              src="icon.png"
+              alt="">
+
+          </div>
+
+
+          <div>
+
+            <h2 id="sidePageTitle">
+              Messages
+            </h2>
+
+            <span
+              id="meLabel"
+              class="muted">
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <button
+          id="logoutBtn"
+          class="icon-btn logout-btn"
+          type="button"
+          aria-label="Log out">
+
+          ↪
+
+        </button>
+
+      </header>
+
+
+
+      <!-- =================================================
+           APP NAVIGATION
+           ================================================= -->
+
+      <nav
+        class="app-nav"
+        aria-label="Main navigation">
+
+
+        <button
+          id="messagesTabBtn"
+          class="nav-item active"
+          type="button">
+
+          <span class="nav-icon">
+            💬
+          </span>
+
+          <span>
+            Messages
+          </span>
+
+        </button>
+
+
+        <button
+          id="memesTabBtn"
+          class="nav-item"
+          type="button">
+
+          <span class="nav-icon">
+            😂
+          </span>
+
+          <span>
+            Memes
+          </span>
+
+        </button>
+
+
+      </nav>
+
+
+
+      <!-- =================================================
+           MESSAGE SEARCH
+           ================================================= -->
+
+      <div
+        id="messagesSearch"
+        class="search-wrap">
+
+        <div class="search-box">
+
+          <span class="search-icon">
+            ⌕
+          </span>
+
+
+          <input
+            id="userSearch"
+            type="search"
+            placeholder="Search people..."
+            autocomplete="off"
+            autocapitalize="none"
+            autocorrect="off"
+            spellcheck="false">
+
+        </div>
+
+      </div>
+
+
+
+      <!-- USER LIST -->
+
+      <div
+        id="userList"
+        class="user-list">
+      </div>
+
+
+    </aside>
+
+
+
+    <!-- ===================================================
+         CHAT
+         =================================================== -->
+
+    <main
+      class="chat"
+      id="chatPanel">
+
+
+      <!-- CHAT HEADER -->
+
+      <header class="chat-head">
+
+
+        <button
+          id="backBtn"
+          class="icon-btn mobile-only"
+          type="button"
+          aria-label="Back">
+
+          ‹
+
+        </button>
+
+
+        <div
+          class="avatar chat-avatar"
+          id="chatAvatar">
+
+          ?
+
+        </div>
+
+
+        <div class="chat-person">
+
+          <strong id="chatName">
+            Select a user
+          </strong>
+
+
+          <span id="presence">
+            Choose someone to chat
+          </span>
+
+        </div>
+
+
+      </header>
+
+
+
+      <!-- MESSAGES -->
+
+      <div
+        id="messages"
+        class="messages">
+
+
+        <div class="empty">
+
+
+          <div class="empty-icon">
+            ✦
+          </div>
+
+
+          <strong>
+            Select a person
+          </strong>
+
+
+          <span>
+            Start a conversation on Messy.
+          </span>
+
+
+        </div>
+
+
+      </div>
+
+
+
+      <!-- TYPING -->
+
+      <div
+        id="typing"
+        class="typing hidden">
+
+        typing…
+
+      </div>
+
+
+
+      <!-- COMPOSER -->
+
+      <div class="composer-area">
+
+
+        <div
+          id="uploadStatus"
+          class="upload-status">
+        </div>
+
+
+        <div class="composer">
+
+
+          <!-- IMAGE INPUT -->
+
+          <input
+            id="imageInput"
+            type="file"
+            accept="image/*"
+            class="hidden">
+
+
+          <!-- IMAGE BUTTON -->
+
+          <button
+            id="imageBtn"
+            class="icon-btn composer-btn"
+            type="button"
+            aria-label="Send image">
+
+            +
+
+          </button>
+
+
+          <!-- VOICE BUTTON -->
+
+          <button
+            id="recordBtn"
+            class="icon-btn composer-btn voice-btn"
+            type="button"
+            aria-label="Voice message">
+
+            ●
+
+          </button>
+
+
+          <!-- MESSAGE INPUT -->
+
+          <textarea
+            id="messageInput"
+            rows="1"
+            placeholder="Message..."
+            disabled
+            autocapitalize="sentences"
+            autocorrect="on"
+            spellcheck="true"></textarea>
+
+
+          <!-- SEND -->
+
+          <button
+            id="sendBtn"
+            class="send"
+            type="button"
+            disabled
+            aria-label="Send message">
+
+            ↑
+
+          </button>
+
+
+        </div>
+
+
+      </div>
+
+
+    </main>
+
+
+
+    <!-- ===================================================
+         MEMES PAGE
+         =================================================== -->
 
     <section
-      id="chatView"
-      class="app-shell hidden">
+      id="memesPage"
+      class="memes-page">
 
 
-      <!-- SIDEBAR -->
+      <!-- MEMES HEADER -->
 
-      <aside class="sidebar">
-
-        <header class="side-head">
-
-          <div class="side-title">
-
-            <div class="mini-brand">
-              <img src="icon.png" alt="">
-            </div>
-
-            <div>
-              <h2>Messages</h2>
-              <span
-                id="meLabel"
-                class="muted">
-              </span>
-            </div>
-
-          </div>
+      <div class="memes-header">
 
 
-          <button
-            id="logoutBtn"
-            class="icon-btn logout-btn"
-            type="button"
-            aria-label="Log out">
-            ↪
-          </button>
+        <div>
 
-        </header>
+          <h1>
+            Memes
+          </h1>
 
 
-        <div class="search-wrap">
-
-          <div class="search-box">
-
-            <span class="search-icon">
-              ⌕
-            </span>
-
-            <input
-              id="userSearch"
-              type="search"
-              placeholder="Search people..."
-              autocomplete="off"
-              autocapitalize="none"
-              autocorrect="off"
-              spellcheck="false">
-
-          </div>
+          <p>
+            Find something stupid enough to send.
+          </p>
 
         </div>
 
 
-        <div
-          id="userList"
-          class="user-list">
-        </div>
+        <button
+          id="refreshMemes"
+          class="refresh-memes"
+          type="button"
+          aria-label="Refresh memes">
 
-      </aside>
+          ↻
 
-
-      <!-- CHAT -->
-
-      <main class="chat">
+        </button>
 
 
-        <header class="chat-head">
-
-          <button
-            id="backBtn"
-            class="icon-btn mobile-only"
-            type="button"
-            aria-label="Back">
-            ‹
-          </button>
+      </div>
 
 
-          <div
-            class="avatar chat-avatar"
-            id="chatAvatar">
-            ?
+
+      <!-- MEME SEARCH -->
+
+      <div class="meme-search">
+
+
+        <span>
+          ⌕
+        </span>
+
+
+        <input
+          id="memeSearch"
+          type="search"
+          placeholder="Search memes..."
+          autocomplete="off"
+          autocapitalize="none"
+          autocorrect="off"
+          spellcheck="false">
+
+
+      </div>
+
+
+
+      <!-- MEME CATEGORIES -->
+
+      <div
+        id="memeCategories"
+        class="meme-categories">
+
+
+        <button
+          class="meme-category active"
+          data-category="hot"
+          type="button">
+
+          🔥 Trending
+
+        </button>
+
+
+        <button
+          class="meme-category"
+          data-category="funny"
+          type="button">
+
+          😂 Funny
+
+        </button>
+
+
+        <button
+          class="meme-category"
+          data-category="reaction"
+          type="button">
+
+          💀 Reactions
+
+        </button>
+
+
+        <button
+          class="meme-category"
+          data-category="gaming"
+          type="button">
+
+          🎮 Gaming
+
+        </button>
+
+
+        <button
+          class="meme-category"
+          data-category="random"
+          type="button">
+
+          🗿 Random
+
+        </button>
+
+
+      </div>
+
+
+
+      <!-- MEME GRID -->
+
+      <div
+        id="memeGrid"
+        class="meme-grid">
+
+
+        <div class="meme-loading">
+
+
+          <div class="meme-loader">
           </div>
 
 
-          <div class="chat-person">
+          <span>
+            Loading memes...
+          </span>
 
-            <strong id="chatName">
-              Select a user
-            </strong>
-
-            <span id="presence">
-              Choose someone to chat
-            </span>
-
-          </div>
-
-        </header>
-
-
-        <div
-          id="messages"
-          class="messages">
-
-          <div class="empty">
-
-            <div class="empty-icon">
-              ✦
-            </div>
-
-            <strong>
-              Select a person
-            </strong>
-
-            <span>
-              Start a conversation on Messy.
-            </span>
-
-          </div>
-
-        </div>
-
-
-        <div
-          id="typing"
-          class="typing hidden">
-          typing…
-        </div>
-
-
-        <div class="composer-area">
-
-          <div
-            id="uploadStatus"
-            class="upload-status">
-          </div>
-
-
-          <div class="composer">
-
-
-            <input
-              id="imageInput"
-              type="file"
-              accept="image/*"
-              class="hidden">
-
-
-            <button
-              id="imageBtn"
-              class="icon-btn composer-btn"
-              type="button"
-              aria-label="Send image">
-              +
-            </button>
-
-
-            <button
-              id="recordBtn"
-              class="icon-btn composer-btn voice-btn"
-              type="button"
-              aria-label="Voice message">
-              ●
-            </button>
-
-
-            <textarea
-              id="messageInput"
-              rows="1"
-              placeholder="Message..."
-              disabled
-              autocapitalize="sentences"
-              autocorrect="on"
-              spellcheck="true">
-            </textarea>
-
-
-            <button
-              id="sendBtn"
-              class="send"
-              type="button"
-              disabled
-              aria-label="Send message">
-              ↑
-            </button>
-
-
-          </div>
 
         </div>
 
-      </main>
+
+      </div>
+
+
+
+      <!-- EMPTY STATE -->
+
+      <div
+        id="memeEmpty"
+        class="meme-empty hidden">
+
+
+        <div class="meme-empty-icon">
+          🗿
+        </div>
+
+
+        <strong>
+          No memes found
+        </strong>
+
+
+        <span>
+          Try searching for something else.
+        </span>
+
+
+      </div>
+
 
     </section>
 
-  </div>
 
 
-  <!-- Supabase -->
+  </section>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <!-- Your Supabase configuration -->
+</div>
 
-  <script src="config.js"></script>
 
-  <!-- Main application -->
 
-  <script src="app.js"></script>
+<!-- =====================================================
+     SUPABASE
+     ===================================================== -->
+
+<script
+  src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+</script>
+
+
+<!-- =====================================================
+     CONFIG
+     ===================================================== -->
+
+<script src="config.js"></script>
+
+
+<!-- =====================================================
+     MAIN APP
+     ===================================================== -->
+
+<script src="app.js"></script>
+
 
 </body>
+
 </html>
