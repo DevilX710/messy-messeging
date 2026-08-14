@@ -1303,3 +1303,87 @@ textarea {
   .meme-search { height: 38px; }
   .meme-category { height: 29px; }
 }
+
+/* =========================================================
+   MESSY 4-TAB NAV + DISCOVER + AI
+   ========================================================= */
+.main-nav{padding:8px 10px 4px;border-bottom:1px solid var(--line);}
+.main-nav-item{display:inline-block;width:24.2%;vertical-align:top;background:transparent;color:var(--muted);padding:8px 2px;border-radius:10px;text-align:center;}
+.main-nav-item span{display:block;font-size:17px;line-height:18px;margin-bottom:3px;}
+.main-nav-item b{display:block;font-size:9px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.main-nav-item.active{background:rgba(120,87,255,.15);color:var(--text);}
+.content-page{position:absolute;left:280px;right:0;top:0;bottom:0;background:var(--bg);overflow:auto;padding:24px 26px 30px;-webkit-overflow-scrolling:touch;}
+.content-page.hidden{display:none!important;}
+.page-head{display:table;width:100%;margin-bottom:18px;}
+.page-head>div{display:table-cell;vertical-align:middle;}
+.page-head h1{margin:0;font-size:28px;letter-spacing:-.6px;}
+.page-head p{margin:5px 0 0;color:var(--muted);font-size:12px;}
+.round-btn{display:table-cell;vertical-align:middle;float:right;width:40px;height:40px;border-radius:12px;background:var(--panel-2);color:var(--text);font-size:20px;}
+.wide-search{height:46px;background:var(--panel-2);border:1px solid var(--line);border-radius:14px;display:flex;align-items:center;padding:0 13px;margin-bottom:12px;}
+.wide-search span{color:var(--muted);font-size:19px;margin-right:8px;}
+.wide-search input{width:100%;border:0px none;outline:0;background:;color:var(--text);font-size:13px}
+.chip-row{white-space:nowrap;overflow:auto;-webkit-overflow-scrolling:touch;padding-bottom:5px;margin-bottom:14px;}
+.chip{display:inline-block;margin-right:6px;height:32px;padding:0 12px;border-radius:16px;background:var(--panel-2);color:var(--muted);font-size:10px;}
+.chip.active{background:var(--purple);color:#fff;}
+
+/* Discover */
+.network-card{background:linear-gradient(135deg,rgba(120,87,255,.18),rgba(20,18,28,.95));border:1px solid rgba(120,87,255,.2);border-radius:17px;padding:16px;margin-bottom:18px;}
+.network-card .network-name{font-weight:800;font-size:15px;margin-bottom:2px;}
+.network-card .network-handle{color:var(--muted);font-size:11px;margin-bottom:14px;}
+.network-stats{display:flex;}
+.network-stat{flex:1;text-align:center;border-right:1px solid var(--line);}
+.network-stat:last-child{border-right:0px none;}
+.network-stat strong{display:block;font-size:18px;}
+.network-stat span{font-size:9px;color:var(--muted);}
+.section-title{display:flex;align-items:center;justify-content:space-between;margin:10px 0 9px;}
+.section-title h3{margin:0;font-size:14px;}
+.section-title span{font-size:10px;color:var(--muted);}
+.people-list{width:100%;}
+.person-card{display:flex;align-items:center;background:var(--panel-2);border:1px solid var(--line);border-radius:14px;padding:10px;margin-bottom:8px;min-height:64px;}
+.person-avatar{width:43px;height:43px;border-radius:50%;background:linear-gradient(145deg,#2a2538,#17141f);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;margin-right:10px;flex:0 0 auto;}
+.person-info{min-width:0;flex:1;}
+.person-info strong{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.person-info span{display:block;color:var(--muted);font-size:10px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.follow-btn{min-width:78px;height:32px;border-radius:10px;background:var(--purple);color:#fff;font-size:10px;font-weight:800;}
+.follow-btn.following{background:var(--panel-3);border:1px solid var(--line);color:var(--text);}
+.network-panel{margin-top:15px;padding-top:13px;border-top:1px solid var(--line);}
+.network-panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;}
+.network-panel-head h3{margin:0;font-size:14px;}
+.network-panel-head .icon-btn{width:30px;height:30px;}
+
+/* AI */
+.ai-page{display:flex;flex-direction:column;}
+.ai-head{flex:0 0 auto;}
+.ai-messages{flex:1 1 auto;overflow:auto;padding:4px 4px 16px;-webkit-overflow-scrolling:touch;min-height:120px;}
+.ai-welcome{text-align:center;max-width:440px;margin:60px auto 20px;color:var(--muted);}
+.ai-orb{width:58px;height:58px;border-radius:18px;margin:0 auto 13px;background:linear-gradient(145deg,#7c5cff,#30215f);display:flex;align-items:center;justify-content:center;font-size:27px;box-shadow:0 12px 35px rgba(120,87,255,.2);}
+.ai-welcome strong{display:block;color:var(--text);font-size:17px;margin-bottom:7px;}
+.ai-welcome span{display:block;font-size:11px;line-height:1.5;}
+.ai-row{display:flex;margin:8px 0;}
+.ai-row.user{justify-content:flex-end;}
+.ai-bubble{max-width:78%;padding:10px 12px;border-radius:15px;background:var(--panel-2);border:1px solid var(--line);font-size:12px;line-height:1.5;word-wrap:break-word;}
+.ai-row.user .ai-bubble{background:var(--purple);border-color:transparent;color:#fff;border-bottom-right-radius:5px;}
+.ai-row.assistant .ai-bubble{border-bottom-left-radius:5px;}
+.ai-composer{flex:0 0 auto;display:flex;align-items:flex-end;background:var(--panel-2);border:1px solid var(--line);border-radius:15px;padding:6px;margin-top:7px;}
+.ai-composer textarea{flex:1;min-height:38px;max-height:110px;resize:none;background:;border:0px none;outline:0;color:var(--text);padding:9px;font-size:12px}
+.ai-composer .send{width:38px;height:38px;flex:0 0 38px;}
+.ai-status{height:16px;color:var(--muted);font-size:9px;text-align:center;padding-top:3px;}
+.ai-busy{opacity:.65;}
+
+@media screen and (max-width:700px){
+  .content-page{left:0;padding:14px 12px 20px;}
+  .main-nav{padding:7px 5px 4px;}
+  .main-nav-item{width:24.2%;padding:7px 1px;}
+  .main-nav-item span{font-size:16px;}
+  .main-nav-item b{font-size:8px;}
+  .page-head h1{font-size:23px;}
+  .page-head p{font-size:10px;}
+  .wide-search{height:43px;}
+  .ai-welcome{margin-top:40px;}
+}
+@media screen and (max-width:390px){
+  .content-page{padding-left:9px;padding-right:9px;}
+  .person-card{padding:8px;}
+  .person-avatar{width:39px;height:39px;}
+  .follow-btn{min-width:70px;height:30px;font-size:9px;}
+}
