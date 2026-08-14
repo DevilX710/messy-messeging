@@ -1,13 +1,23 @@
 /* =========================================================
    MESSY
-   Dark aesthetic UI
-   Primary target: iPhone 6 / iOS 12.5
+   iPhone 6 / iOS 12.5 FIRST
+   No modern viewport units, no flex-gap dependency.
    ========================================================= */
 
-
-/* =========================================================
-   RESET
-   ========================================================= */
+:root {
+  --bg: #09080d;
+  --panel: #0f0e15;
+  --panel-2: #14121c;
+  --panel-3: #191622;
+  --line: rgba(255,255,255,.075);
+  --text: #f5f2fb;
+  --muted: #918b9e;
+  --muted-2: #686272;
+  --purple: #7857ff;
+  --purple-2: #a78bfa;
+  --green: #3edc8a;
+  --danger: #ff667c;
+}
 
 * {
   box-sizing: border-box;
@@ -16,1516 +26,1280 @@
 
 html,
 body {
-  width: 100%;
-  height: 100%;
   margin: 0;
   padding: 0;
-}
-
-html {
-  background: #09080d;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background:
-    radial-gradient(
-      circle at 85% 10%,
-      rgba(112, 72, 255, 0.13),
-      transparent 35%
-    ),
-    radial-gradient(
-      circle at 10% 90%,
-      rgba(142, 72, 255, 0.08),
-      transparent 35%
-    ),
-    #09080d;
-
-  color: #f4f1fa;
-
-  font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    "Helvetica Neue",
-    Arial,
-    sans-serif;
-
   overflow: hidden;
-
-  -webkit-font-smoothing: antialiased;
 }
-
-
-/* =========================================================
-   BASIC
-   ========================================================= */
 
 button,
 input,
 textarea {
-  font-family: inherit;
+  font: inherit;
 }
 
 button {
-  border: 0;
-  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
   cursor: pointer;
+  border: 0px none;
 }
 
 input,
 textarea {
-  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .hidden {
   display: none !important;
 }
 
-
-/* =========================================================
-   APP
-   ========================================================= */
-
-#app {
-  width: 100%;
-  height: 100%;
-
-  min-height: 100%;
-}
-
-
-/* =========================================================
-   AUTH SCREEN
-   ========================================================= */
-
 .screen {
+  position: relative;
   width: 100%;
+  height: 100vh;
   min-height: 100vh;
-  min-height: -webkit-fill-available;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 24px;
+  display: table;
+  background:
+    radial-gradient(circle at 85% 10%, rgba(120,87,255,.14), transparent 28%),
+    radial-gradient(circle at 15% 90%, rgba(167,139,250,.08), transparent 30%),
+    var(--bg);
 }
-
-
-/* =========================================================
-   AUTH CARD
-   ========================================================= */
 
 .auth-card {
-  width: 430px;
-  max-width: 100%;
-
-  padding: 34px;
-
-  border-radius: 28px;
-
-  background:
-    linear-gradient(
-      145deg,
-      rgba(29, 27, 38, 0.97),
-      rgba(15, 14, 21, 0.98)
-    );
-
-  border: 1px solid rgba(255,255,255,0.06);
-
-  box-shadow:
-    0 30px 80px rgba(0,0,0,0.55),
-    0 0 60px rgba(111,70,255,0.08);
-
-  overflow: hidden;
+  display: table-cell;
+  vertical-align: middle;
+  width: 100%;
+  padding: 28px 20px;
 }
 
+.auth-card > * {
+  max-width: 390px;
+  margin-left: auto;
+  margin-right: auto;
+}
 
-/* =========================================================
-   BRAND
-   ========================================================= */
+.auth-card {
+  text-align: left;
+}
 
 .brand-lockup {
+  display: -webkit-box;
   display: flex;
+  -webkit-box-align: center;
   align-items: center;
-  gap: 16px;
-
-  margin-bottom: 30px;
+  margin-bottom: 28px;
 }
 
 .brand-icon {
-  width: 62px !important;
-  height: 62px !important;
-
-  min-width: 62px !important;
-  max-width: 62px !important;
-
-  min-height: 62px !important;
-  max-height: 62px !important;
-
-  display: block;
-
-  object-fit: cover;
-
-  border-radius: 18px;
-
-  box-shadow:
-    0 0 30px rgba(116,76,255,0.28);
+  width: 58px;
+  height: 58px;
+  border-radius: 17px;
+  margin-right: 14px;
+  box-shadow: 0 10px 35px rgba(103,70,255,.22);
 }
-
 
 .brand-lockup h1 {
   margin: 0;
-
-  font-size: 28px;
-  font-weight: 800;
-
-  letter-spacing: -0.8px;
+  font-size: 35px;
+  line-height: 1;
+  letter-spacing: -1.2px;
 }
-
 
 .brand-lockup p {
-  margin: 5px 0 0;
-
-  color: #817b91;
-
+  margin: 7px 0 0;
+  color: var(--muted);
   font-size: 13px;
 }
-
-
-/* =========================================================
-   AUTH TABS
-   ========================================================= */
 
 .tabs {
+  display: -webkit-box;
   display: flex;
-
+  margin-bottom: 12px;
   padding: 4px;
-
-  margin-bottom: 20px;
-
-  background: #15131d;
-
-  border: 1px solid rgba(255,255,255,0.04);
-
-  border-radius: 13px;
+  background: rgba(255,255,255,.045);
+  border: 1px solid var(--line);
+  border-radius: 14px;
 }
-
 
 .tab {
+  -webkit-box-flex: 1;
   flex: 1;
-
-  height: 40px;
-
-  border-radius: 9px;
-
+  min-width: 0;
+  padding: 11px 7px;
+  border-radius: 10px;
   background: transparent;
-
-  color: #807a8e;
-
-  font-size: 13px;
+  color: var(--muted);
   font-weight: 700;
-
-  transition:
-    background 0.2s ease,
-    color 0.2s ease;
+  font-size: 13px;
 }
 
+.tab + .tab {
+  margin-left: 4px;
+}
 
 .tab.active {
-  color: white;
-
-  background:
-    linear-gradient(
-      135deg,
-      #8158ff,
-      #6840e9
-    );
-
-  box-shadow:
-    0 7px 20px rgba(110,70,255,0.25);
+  background: #211b31;
+  color: #fff;
+  box-shadow: 0 4px 18px rgba(0,0,0,.18);
 }
-
-
-/* =========================================================
-   AUTH INPUTS
-   ========================================================= */
 
 #authForm {
-  width: 100%;
+  display: block;
 }
-
 
 #authForm input {
   display: block;
-
   width: 100%;
   height: 48px;
-
-  margin-bottom: 12px;
-
+  margin-top: 10px;
   padding: 0 15px;
-
-  border: 1px solid rgba(255,255,255,0.05);
-
-  border-radius: 12px;
-
-  background: #15131d;
-
-  color: white;
-
-  font-size: 14px;
-
-  -webkit-appearance: none;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  outline: none;
+  background: #121019;
+  color: var(--text);
 }
-
 
 #authForm input:focus {
-  border-color: rgba(124,82,255,0.6);
-
-  box-shadow:
-    0 0 0 3px rgba(112,72,255,0.08);
+  border-color: rgba(120,87,255,.7);
+  box-shadow: 0 0 0 3px rgba(120,87,255,.10);
 }
 
-
-#authForm input::placeholder {
-  color: #676273;
+#authForm input::-webkit-input-placeholder {
+  color: #706a79;
 }
-
-
-/* =========================================================
-   PRIMARY BUTTON
-   ========================================================= */
 
 .primary {
+  display: block;
   width: 100%;
   height: 48px;
-
-  margin-top: 4px;
-
-  border-radius: 12px;
-
-  background:
-    linear-gradient(
-      135deg,
-      #855cff,
-      #693ee8
-    );
-
-  color: white;
-
-  font-size: 14px;
+  margin-top: 12px;
+  border-radius: 13px;
+  background: linear-gradient(135deg, #7653ff, #6844e8);
+  color: #fff;
   font-weight: 800;
-
-  box-shadow:
-    0 12px 28px rgba(108,67,245,0.28);
+  box-shadow: 0 10px 25px rgba(103,70,255,.18);
 }
 
-
-.primary:active {
-  transform: scale(0.98);
+.primary:active,
+.send:active,
+.icon-btn:active,
+.user:active {
+  opacity: .78;
 }
-
-
-/* =========================================================
-   AUTH STATUS
-   ========================================================= */
 
 .message-status {
-  min-height: 18px;
-
-  margin: 14px 0 0;
-
-  color: #9d96aa;
-
-  text-align: center;
-
+  min-height: 20px;
+  margin-top: 12px;
+  color: var(--muted);
   font-size: 12px;
+  text-align: center;
 }
-
-
-/* =========================================================
-   MAIN APP
-   ========================================================= */
 
 .app-shell {
-  position: relative;
-
-  width: calc(100% - 48px);
-  height: calc(100vh - 48px);
-
-  margin: 24px;
-
+  display: -webkit-box;
   display: flex;
-
+  width: 100%;
+  height: 100vh;
+  min-height: 100vh;
   overflow: hidden;
-
-  border-radius: 28px;
-
-  background: #0d0c12;
-
-  border: 1px solid rgba(255,255,255,0.06);
-
-  box-shadow:
-    0 30px 80px rgba(0,0,0,0.5);
+  background: var(--bg);
 }
 
-
-/* =========================================================
-   SIDEBAR
-   ========================================================= */
+/* SIDEBAR */
 
 .sidebar {
-  width: 310px;
-  min-width: 310px;
-
-  background:
-    linear-gradient(
-      180deg,
-      #111017,
-      #0d0c12
-    );
-
-  border-right:
-    1px solid rgba(255,255,255,0.06);
-
+  width: 340px;
+  min-width: 340px;
+  height: 100%;
+  display: -webkit-box;
   display: flex;
+  -webkit-box-orient: vertical;
   flex-direction: column;
+  background: rgba(14,13,20,.97);
+  border-right: 1px solid var(--line);
 }
-
-
-/* =========================================================
-   SIDEBAR HEADER
-   ========================================================= */
 
 .side-head {
-  min-height: 92px;
-
-  padding: 20px;
-
+  min-height: 84px;
+  padding: 18px 18px;
+  display: -webkit-box;
   display: flex;
+  -webkit-box-align: center;
   align-items: center;
+  -webkit-box-pack: justify;
   justify-content: space-between;
-
-  gap: 12px;
+  border-bottom: 1px solid var(--line);
 }
-
 
 .side-title {
-  min-width: 0;
-
+  display: -webkit-box;
   display: flex;
+  -webkit-box-align: center;
   align-items: center;
-
-  gap: 12px;
+  min-width: 0;
 }
-
 
 .mini-brand {
-  width: 42px !important;
-  height: 42px !important;
-
-  min-width: 42px !important;
-  min-height: 42px !important;
-
+  width: 38px;
+  height: 38px;
+  margin-right: 11px;
+  border-radius: 11px;
   overflow: hidden;
-
-  border-radius: 13px;
-
-  flex-shrink: 0;
+  box-shadow: 0 7px 22px rgba(103,70,255,.15);
 }
-
 
 .mini-brand img {
-  width: 42px !important;
-  height: 42px !important;
-
-  min-width: 42px !important;
-  max-width: 42px !important;
-
-  min-height: 42px !important;
-  max-height: 42px !important;
-
+  width: 100%;
+  height: 100%;
   display: block;
-
-  object-fit: cover;
 }
 
-
-.side-title h2 {
+.side-head h2 {
   margin: 0;
-
-  font-size: 23px;
-
-  letter-spacing: -0.6px;
+  font-size: 21px;
+  letter-spacing: -.6px;
 }
-
 
 .muted {
-  display: block;
-
-  margin-top: 3px;
-
-  color: #6e6879;
-
+  color: var(--muted);
   font-size: 11px;
 }
-
-
-/* =========================================================
-   ICON BUTTON
-   ========================================================= */
 
 .icon-btn {
   width: 42px;
   height: 42px;
-
-  min-width: 42px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
   border-radius: 13px;
+  background: #171520;
+  color: #d9d3e4;
+  border: 1px solid rgba(255,255,255,.055);
+}
 
-  background: #17151f;
-
-  color: #a49caf;
-
+.logout-btn {
   font-size: 20px;
 }
 
-
-.icon-btn:active {
-  background: #211d2d;
-  transform: scale(0.96);
-}
-
-
-/* =========================================================
-   SEARCH
-   ========================================================= */
-
 .search-wrap {
-  padding: 0 16px 16px;
+  padding: 13px 14px 10px;
 }
-
 
 .search-box {
-  height: 46px;
-
+  height: 44px;
+  display: -webkit-box;
   display: flex;
+  -webkit-box-align: center;
   align-items: center;
-
-  padding: 0 14px;
-
-  border-radius: 13px;
-
-  background: #17151f;
-
-  border: 1px solid rgba(255,255,255,0.035);
+  background: #15131d;
+  border: 1px solid var(--line);
+  border-radius: 14px;
 }
-
 
 .search-icon {
-  margin-right: 9px;
-
-  color: #706a7b;
-
-  font-size: 21px;
+  width: 34px;
+  text-align: center;
+  color: #8b8498;
+  font-size: 22px;
+  line-height: 1;
 }
-
 
 .search-box input {
-  width: 100%;
-
-  border: 0;
+  -webkit-box-flex: 1;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0px none;
   outline: 0;
-
-  background: transparent;
-
-  color: white;
-
-  font-size: 13px;
+  background: ;
+  color: var(--text); padding-left:0; padding-right:10px; padding-top:0; padding-bottom:0
 }
 
-
-.search-box input::placeholder {
-  color: #696372;
+.search-box input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
 }
 
-
-/* =========================================================
-   USER LIST
-   ========================================================= */
+.search-box input::-webkit-input-placeholder {
+  color: #706a79;
+}
 
 .user-list {
+  -webkit-box-flex: 1;
   flex: 1;
-
   overflow-y: auto;
-
+  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-
-  padding: 4px 10px 14px;
+  padding: 3px 8px 16px;
 }
-
 
 .user {
   width: 100%;
-
-  min-height: 64px;
-
+  min-height: 67px;
+  display: -webkit-box;
   display: flex;
+  -webkit-box-align: center;
   align-items: center;
-
-  padding: 9px 10px;
-
-  margin-bottom: 3px;
-
-  text-align: left;
-
-  border-radius: 13px;
-
+  padding: 10px 10px;
+  margin-bottom: 2px;
+  border-radius: 14px;
   background: transparent;
-
-  color: white;
+  color: var(--text);
+  text-align: left;
 }
 
-
-.user:active,
 .user.active {
-  background: #191621;
+  background: #191624;
 }
 
+.user:hover {
+  background: #15131e;
+}
 
 .avatar {
-  width: 42px;
-  height: 42px;
-
-  min-width: 42px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
+  width: 43px;
+  height: 43px;
+  min-width: 43px;
   border-radius: 50%;
-
-  background:
-    linear-gradient(
-      135deg,
-      #7048ff,
-      #b05cff
-    );
-
+  display: -webkit-box;
+  display: flex;
+  -webkit-box-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  justify-content: center;
+  background: linear-gradient(145deg, #7755ff, #3f2a9d);
   color: white;
-
-  font-size: 12px;
   font-weight: 800;
+  font-size: 14px;
+  box-shadow: 0 7px 18px rgba(104,73,255,.16);
 }
-
 
 .user-info {
   min-width: 0;
-
   padding-left: 11px;
 }
 
-
 .user-info strong {
   display: block;
-
   overflow: hidden;
-
-  white-space: nowrap;
-
   text-overflow: ellipsis;
-
+  white-space: nowrap;
   font-size: 13px;
 }
 
-
 .user-info span {
   display: block;
-
-  margin-top: 3px;
-
+  margin-top: 5px;
   overflow: hidden;
-
-  white-space: nowrap;
-
   text-overflow: ellipsis;
-
-  color: #6d6777;
-
+  white-space: nowrap;
+  color: var(--muted);
   font-size: 11px;
 }
-
 
 .dot {
   display: inline-block;
-
-  width: 6px;
-  height: 6px;
-
+  width: 7px;
+  height: 7px;
   margin-right: 5px;
-
   border-radius: 50%;
-
-  background: #4d4855;
+  background: #4d4856;
 }
-
 
 .dot.online {
-  background: #48d89a;
+  background: var(--green);
+  box-shadow: 0 0 8px rgba(62,220,138,.35);
 }
 
+.empty-users {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+}
 
-/* =========================================================
-   CHAT
-   ========================================================= */
+/* CHAT */
 
 .chat {
-  min-width: 0;
-
+  -webkit-box-flex: 1;
   flex: 1;
-
+  min-width: 0;
+  height: 100%;
+  display: -webkit-box;
   display: flex;
+  -webkit-box-orient: vertical;
   flex-direction: column;
-
   background:
-    radial-gradient(
-      circle at 80% 20%,
-      rgba(105,70,200,0.07),
-      transparent 35%
-    ),
-    #0c0b11;
+    radial-gradient(circle at 85% 12%, rgba(120,87,255,.08), transparent 27%),
+    radial-gradient(circle at 12% 85%, rgba(167,139,250,.055), transparent 25%),
+    #0a090f;
 }
-
-
-/* =========================================================
-   CHAT HEADER
-   ========================================================= */
 
 .chat-head {
-  height: 92px;
-
-  min-height: 92px;
-
+  min-height: 78px;
+  padding: 14px 20px;
+  display: -webkit-box;
   display: flex;
+  -webkit-box-align: center;
   align-items: center;
-
-  padding: 0 28px;
-
-  border-bottom:
-    1px solid rgba(255,255,255,0.055);
-
-  background:
-    rgba(12,11,17,0.94);
+  border-bottom: 1px solid var(--line);
+  background: rgba(14,13,20,.86);
 }
-
 
 .chat-avatar {
-  width: 54px !important;
-  height: 54px !important;
-
-  min-width: 54px !important;
-  min-height: 54px !important;
-
-  margin-right: 14px;
+  margin-right: 12px;
 }
 
+.chat-person {
+  min-width: 0;
+}
 
 .chat-person strong {
   display: block;
-
-  font-size: 16px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 15px;
 }
-
 
 .chat-person span {
   display: block;
-
   margin-top: 4px;
-
-  color: #6f6978;
-
-  font-size: 12px;
-}
-
-
-/* =========================================================
-   MESSAGES
-   ========================================================= */
-
-.messages {
-  flex: 1;
-
-  min-height: 0;
-
-  overflow-y: auto;
-
-  -webkit-overflow-scrolling: touch;
-
-  padding: 22px 28px;
-}
-
-
-.bubble-row {
-  display: flex;
-
-  justify-content: flex-start;
-
-  margin-bottom: 10px;
-}
-
-
-.bubble-row.mine {
-  justify-content: flex-end;
-}
-
-
-.bubble {
-  position: relative;
-
-  max-width: 70%;
-
-  padding: 10px 13px;
-
-  border-radius: 16px;
-
-  background: #191721;
-
-  color: #eeeaf4;
-
-  font-size: 14px;
-
-  line-height: 1.45;
-}
-
-
-.bubble-row.mine .bubble {
-  background:
-    linear-gradient(
-      135deg,
-      #7049ee,
-      #6240d9
-    );
-}
-
-
-.bubble img {
-  display: block;
-
-  max-width: 240px;
-
-  width: auto;
-  height: auto;
-
-  border-radius: 11px;
-}
-
-
-.meta {
-  margin-top: 4px;
-
-  opacity: 0.55;
-
-  font-size: 9px;
-
-  text-align: right;
-}
-
-
-/* =========================================================
-   EMPTY CHAT
-   ========================================================= */
-
-.empty {
-  height: 100%;
-
-  display: flex;
-  flex-direction: column;
-
-  align-items: center;
-  justify-content: center;
-
-  color: #756e80;
-
-  text-align: center;
-}
-
-
-.empty-icon {
-  width: 70px;
-  height: 70px;
-
-  margin-bottom: 17px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 22px;
-
-  background:
-    linear-gradient(
-      135deg,
-      #8159ff,
-      #6841e7
-    );
-
-  color: white;
-
-  font-size: 27px;
-
-  box-shadow:
-    0 18px 40px rgba(105,65,240,0.25);
-}
-
-
-.empty strong {
-  color: #aaa3b2;
-
-  font-size: 14px;
-}
-
-
-.empty span {
-  margin-top: 5px;
-
-  font-size: 12px;
-}
-
-
-/* =========================================================
-   TYPING
-   ========================================================= */
-
-.typing {
-  height: 20px;
-
-  padding-left: 28px;
-
-  color: #746d7d;
-
+  color: var(--muted);
   font-size: 11px;
 }
 
+.messages {
+  -webkit-box-flex: 1;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 18px 20px 16px;
+}
 
-/* =========================================================
-   COMPOSER
-   ========================================================= */
+.empty {
+  height: 100%;
+  display: -webkit-box;
+  display: flex;
+  -webkit-box-orient: vertical;
+  flex-direction: column;
+  -webkit-box-pack: center;
+  justify-content: center;
+  -webkit-box-align: center;
+  align-items: center;
+  color: var(--muted);
+  text-align: center;
+}
+
+.empty-icon {
+  width: 58px;
+  height: 58px;
+  margin-bottom: 15px;
+  display: -webkit-box;
+  display: flex;
+  -webkit-box-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  justify-content: center;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #7655ff, #5534c9);
+  color: #fff;
+  font-size: 25px;
+  box-shadow: 0 14px 32px rgba(91,56,230,.22);
+}
+
+.empty strong {
+  color: #ddd8e8;
+  font-size: 14px;
+}
+
+.empty span {
+  margin-top: 6px;
+  font-size: 11px;
+}
+
+.bubble-row {
+  display: -webkit-box;
+  display: flex;
+  margin-bottom: 7px;
+}
+
+.bubble-row.mine {
+  -webkit-box-pack: end;
+  justify-content: flex-end;
+}
+
+.bubble {
+  max-width: 72%;
+  padding: 10px 12px;
+  border-radius: 17px;
+  background: #17151f;
+  border: 1px solid rgba(255,255,255,.045);
+  word-break: break-word;
+  font-size: 14px;
+  line-height: 1.38;
+  box-shadow: 0 5px 18px rgba(0,0,0,.08);
+}
+
+.mine .bubble {
+  background: linear-gradient(145deg, #7554f6, #5d3ed1);
+  border-color: transparent;
+}
+
+.bubble img {
+  display: block;
+  max-width: 260px;
+  max-height: 320px;
+  border-radius: 12px;
+}
+
+.voice {
+  display: block;
+  width: 230px;
+  max-width: 100%;
+}
+
+.meta {
+  margin-top: 5px;
+  color: rgba(255,255,255,.55);
+  font-size: 9px;
+  text-align: right;
+}
+
+.reactionbar {
+  margin-top: 5px;
+  white-space: nowrap;
+}
+
+.reaction {
+  display: inline-block;
+  min-width: 31px;
+  height: 25px;
+  margin-right: 3px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: #100e16;
+  color: #fff;
+  font-size: 11px;
+}
+
+.typing {
+  min-height: 22px;
+  padding: 0 20px 7px;
+  color: var(--muted);
+  font-size: 11px;
+}
 
 .composer-area {
-  padding: 12px 18px 18px;
-
-  border-top:
-    1px solid rgba(255,255,255,0.04);
+  border-top: 1px solid var(--line);
+  background: rgba(12,11,17,.98);
+  padding-bottom: env(safe-area-inset-bottom);
 }
-
 
 .composer {
+  min-height: 67px;
+  padding: 10px 12px;
+  display: -webkit-box;
   display: flex;
+  -webkit-box-align: end;
   align-items: flex-end;
-
-  gap: 10px;
 }
-
-
-.composer textarea {
-  flex: 1;
-
-  min-width: 0;
-
-  min-height: 48px;
-  max-height: 110px;
-
-  padding: 14px 15px;
-
-  resize: none;
-
-  border: 1px solid rgba(255,255,255,0.04);
-
-  border-radius: 16px;
-
-  background: #17151f;
-
-  color: white;
-
-  font-size: 14px;
-
-  line-height: 20px;
-}
-
-
-.composer textarea::placeholder {
-  color: #6d6776;
-}
-
 
 .composer-btn {
-  width: 48px;
-  height: 48px;
-
-  min-width: 48px;
-
-  background: #17151f;
+  min-width: 42px;
+  margin-right: 7px;
 }
 
+.voice-btn {
+  font-size: 12px;
+}
+
+.voice-btn.recording {
+  background: #6e2434;
+  color: #ff9aaa;
+}
+
+.composer textarea {
+  -webkit-box-flex: 1;
+  flex: 1;
+  min-width: 0;
+  min-height: 42px;
+  max-height: 112px;
+  padding: 11px 13px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  outline: 0;
+  resize: none;
+  overflow-y: auto;
+  background: #17151f;
+  color: var(--text);
+  line-height: 19px;
+}
+
+.composer textarea:focus {
+  border-color: rgba(120,87,255,.55);
+}
+
+.composer textarea::-webkit-input-placeholder {
+  color: #716b7a;
+}
 
 .send {
-  width: 48px;
-  height: 48px;
-
-  min-width: 48px;
-
-  border-radius: 15px;
-
-  background:
-    linear-gradient(
-      135deg,
-      #855cff,
-      #673de5
-    );
-
+  width: 43px;
+  height: 42px;
+  min-width: 43px;
+  margin-left: 7px;
+  border-radius: 13px;
+  background: linear-gradient(145deg, #7857ff, #5c3bd2);
   color: white;
-
   font-size: 19px;
-
-  box-shadow:
-    0 10px 25px rgba(104,64,230,0.25);
+  font-weight: 800;
+  box-shadow: 0 8px 22px rgba(104,70,255,.18);
 }
-
 
 .send:disabled {
-  opacity: 0.35;
+  opacity: .35;
+  box-shadow: none;
 }
 
-
-/* =========================================================
-   MOBILE BUTTON
-   ========================================================= */
+.upload-status {
+  min-height: 0;
+  padding: 0 15px;
+  color: var(--muted);
+  font-size: 10px;
+  text-align: center;
+}
 
 .mobile-only {
   display: none;
 }
 
-
-/* =========================================================
-   MOBILE
-   iPhone 6 / iOS 12.5
-   ========================================================= */
+/* iPhone / small screens */
 
 @media screen and (max-width: 700px) {
 
-  html,
   body {
-    width: 100%;
-    height: 100%;
-
     overflow: hidden;
   }
-
-
-  body {
-    background: #09080d;
-  }
-
-
-  /* -------------------------------------------------------
-     AUTH MOBILE
-     ------------------------------------------------------- */
-
-  .screen {
-    width: 100%;
-
-    min-height: 100vh;
-    min-height: -webkit-fill-available;
-
-    height: 100vh;
-    height: -webkit-fill-available;
-
-    padding:
-      18px
-      16px
-      calc(18px + env(safe-area-inset-bottom))
-      16px;
-
-    align-items: center;
-    justify-content: center;
-
-    overflow-y: auto;
-
-    -webkit-overflow-scrolling: touch;
-  }
-
-
-  .auth-card {
-    width: 100%;
-    max-width: 390px;
-
-    padding: 22px 18px 20px;
-
-    border-radius: 23px;
-  }
-
-
-  .brand-lockup {
-    gap: 12px;
-
-    margin-bottom: 20px;
-  }
-
-
-  .brand-icon {
-    width: 54px !important;
-    height: 54px !important;
-
-    min-width: 54px !important;
-    max-width: 54px !important;
-
-    min-height: 54px !important;
-    max-height: 54px !important;
-
-    border-radius: 16px;
-  }
-
-
-  .brand-lockup h1 {
-    font-size: 24px;
-  }
-
-
-  .brand-lockup p {
-    font-size: 11px;
-  }
-
-
-  .tabs {
-    margin-bottom: 16px;
-  }
-
-
-  .tab {
-    height: 38px;
-
-    font-size: 12px;
-  }
-
-
-  #authForm input {
-    height: 46px;
-
-    margin-bottom: 10px;
-
-    font-size: 13px;
-  }
-
-
-  .primary {
-    height: 46px;
-
-    font-size: 13px;
-  }
-
-
-  /* -------------------------------------------------------
-     APP MOBILE
-     ------------------------------------------------------- */
 
   .app-shell {
-    width: 100%;
+    position: relative;
     height: 100vh;
-
-    height: -webkit-fill-available;
-
-    margin: 0;
-
-    border: 0;
-
-    border-radius: 0;
-
-    display: block;
-
-    overflow: hidden;
+    min-height: 100vh;
   }
-
-
-  /* -------------------------------------------------------
-     SIDEBAR MOBILE
-     ------------------------------------------------------- */
 
   .sidebar {
     position: absolute;
-
-    z-index: 10;
-
-    top: 0;
     left: 0;
-
+    top: 0;
+    z-index: 5;
     width: 100%;
     min-width: 0;
-
     height: 100%;
-
-    border: 0;
-
-    background: #0d0c12;
+    border-right: 0;
   }
-
 
   .sidebar.hide-mobile {
     display: none;
   }
 
-
-  .side-head {
-    height: 70px;
-    min-height: 70px;
-
-    padding:
-      calc(10px + env(safe-area-inset-top))
-      16px
-      10px;
-  }
-
-
-  .side-title {
-    gap: 10px;
-  }
-
-
-  .mini-brand {
-    width: 38px !important;
-    height: 38px !important;
-
-    min-width: 38px !important;
-    min-height: 38px !important;
-  }
-
-
-  .mini-brand img {
-    width: 38px !important;
-    height: 38px !important;
-
-    min-width: 38px !important;
-    max-width: 38px !important;
-
-    min-height: 38px !important;
-    max-height: 38px !important;
-  }
-
-
-  .side-title h2 {
-    font-size: 20px;
-  }
-
-
-  .search-wrap {
-    padding:
-      6px
-      14px
-      12px;
-  }
-
-
-  .search-box {
-    height: 44px;
-  }
-
-
-  .user-list {
-    padding:
-      2px
-      10px
-      20px;
-  }
-
-
-  /* -------------------------------------------------------
-     CHAT MOBILE
-     ------------------------------------------------------- */
-
   .chat {
     position: absolute;
-
-    z-index: 20;
-
-    top: 0;
     left: 0;
-
+    top: 0;
+    z-index: 10;
     width: 100%;
     height: 100%;
-
     display: none;
-
-    background: #0c0b11;
   }
-
 
   .chat.open {
+    display: -webkit-box;
     display: flex;
   }
-
-
-  .chat-head {
-    height: 62px;
-    min-height: 62px;
-
-    padding:
-      calc(5px + env(safe-area-inset-top))
-      12px
-      5px;
-  }
-
 
   .mobile-only {
-    display: flex;
-
-    margin-right: 7px;
-
-    width: 38px;
-    height: 38px;
-
-    min-width: 38px;
-
-    background: transparent;
-
-    font-size: 30px;
+    display: block;
+    margin-right: 4px;
   }
 
-
-  .chat-avatar {
-    width: 38px !important;
-    height: 38px !important;
-
-    min-width: 38px !important;
-    min-height: 38px !important;
-
-    margin-right: 9px;
-
-    font-size: 10px;
+  .chat-head {
+    min-height: 64px;
+    padding: 10px 12px;
   }
 
+  .messages {
+    padding: 13px 13px 10px;
+  }
 
-  .chat-person strong {
+  .bubble {
+    max-width: 84%;
     font-size: 14px;
   }
 
-
-  .chat-person span {
-    margin-top: 2px;
-
-    font-size: 10px;
-  }
-
-
-  .messages {
-    padding:
-      14px
-      12px
-      8px;
-  }
-
-
-  .bubble {
-    max-width: 82%;
-
-    padding: 9px 11px;
-
-    border-radius: 15px;
-
-    font-size: 13px;
-  }
-
-
   .bubble img {
-    max-width: 190px;
+    max-width: 220px;
   }
-
-
-  .empty-icon {
-    width: 58px;
-    height: 58px;
-
-    border-radius: 18px;
-
-    font-size: 23px;
-  }
-
-
-  .empty strong {
-    font-size: 13px;
-  }
-
-
-  .empty span {
-    font-size: 11px;
-  }
-
-
-  .typing {
-    height: 18px;
-
-    padding-left: 13px;
-
-    font-size: 10px;
-  }
-
-
-  /* -------------------------------------------------------
-     MOBILE COMPOSER
-     ------------------------------------------------------- */
-
-  .composer-area {
-    padding:
-      8px
-      9px
-      calc(9px + env(safe-area-inset-bottom));
-  }
-
 
   .composer {
-    gap: 7px;
+    padding: 8px;
   }
-
 
   .composer-btn {
-    width: 40px;
-    height: 40px;
-
-    min-width: 40px;
-
-    border-radius: 12px;
+    width: 39px;
+    min-width: 39px;
+    height: 39px;
+    margin-right: 5px;
   }
-
 
   .composer textarea {
-    min-height: 40px;
-
-    padding:
-      10px
-      12px;
-
-    border-radius: 14px;
-
-    font-size: 13px;
-
-    line-height: 19px;
+    min-height: 39px;
+    padding: 9px 11px;
   }
-
 
   .send {
     width: 40px;
-    height: 40px;
-
     min-width: 40px;
-
-    border-radius: 13px;
-
-    font-size: 17px;
+    height: 39px;
+    margin-left: 5px;
   }
 
+  .side-head {
+    min-height: 74px;
+    padding: 14px 14px;
+  }
+
+  .search-wrap {
+    padding: 10px 12px;
+  }
+
+  .user {
+    min-height: 65px;
+    padding: 9px 8px;
+  }
+
+  .auth-card {
+    padding: 22px 18px;
+  }
+
+  .brand-icon {
+    width: 52px;
+    height: 52px;
+  }
+
+  .brand-lockup h1 {
+    font-size: 31px;
+  }
 }
 
+/* iPhone 6 portrait: 375px wide */
 
-/* =========================================================
-   VERY SMALL PHONES
-   ========================================================= */
+@media screen and (max-width: 390px) {
 
-@media screen and (max-width: 360px) {
+  .side-head h2 {
+    font-size: 20px;
+  }
 
-  .screen {
+  .user-info strong {
+    font-size: 13px;
+  }
+
+  .user-info span {
+    font-size: 10px;
+  }
+
+  .avatar {
+    width: 41px;
+    height: 41px;
+    min-width: 41px;
+  }
+
+  .messages {
     padding-left: 10px;
     padding-right: 10px;
   }
 
+  .bubble {
+    max-width: 88%;
+  }
+}
 
-  .auth-card {
-    padding:
-      19px
-      15px
-      17px;
+/* iPhone 6 landscape */
 
-    border-radius: 20px;
+@media screen and (max-height: 500px) and (orientation: landscape) {
+
+  .chat-head {
+    min-height: 55px;
+    padding-top: 7px;
+    padding-bottom: 7px;
   }
 
-
-  .brand-icon {
-    width: 48px !important;
-    height: 48px !important;
-
-    min-width: 48px !important;
-    max-width: 48px !important;
-
-    min-height: 48px !important;
-    max-height: 48px !important;
+  .side-head {
+    min-height: 55px;
   }
 
-
-  .brand-lockup h1 {
-    font-size: 22px;
+  .composer {
+    min-height: 55px;
+    padding-top: 6px;
+    padding-bottom: 6px;
   }
 
-
-  .brand-lockup p {
-    font-size: 10px;
+  .messages {
+    padding-top: 8px;
+    padding-bottom: 8px;
   }
+}
 
+/* Reduced animation / old-device friendly */
 
-  .tab {
-    font-size: 11px;
+@media screen and (prefers-reduced-motion: reduce) {
+  * {
+    -webkit-animation: none !important;
+    animation: none !important;
+    transition: none !important;
   }
-
-
-  .composer-btn,
-  .send {
-    width: 37px;
-    height: 37px;
-
-    min-width: 37px;
-  }
-
 }
 
 
 /* =========================================================
-   LANDSCAPE iPHONE
+   MESSY MEMES + APP NAVIGATION
+   Added for the new Messages / Memes experience.
+   iOS 12.5 friendly: no gap dependency, no svh, no modern
+   selectors required.
    ========================================================= */
 
-@media screen
-  and (max-width: 700px)
-  and (orientation: landscape) {
+.app-nav {
+  display: flex;
+  padding: 0 12px 12px;
+  border-bottom: 1px solid var(--line);
+}
 
-  .screen {
-    align-items: flex-start;
+.nav-item {
+  -webkit-appearance: none;
+  appearance: none;
+  flex: 1;
+  min-width: 0;
+  height: 40px;
+  margin: 0 3px;
+  border: 0px none;
+  border-radius: 12px;
+  background: ;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center; padding-left:8px; padding-right:8px; padding-top:0; padding-bottom:0
+}
 
-    padding-top: 12px;
-    padding-bottom: 12px;
+.nav-item:first-child { margin-left: 0; }
+.nav-item:last-child { margin-right: 0; }
+
+.nav-item.active {
+  color: #fff;
+  background: linear-gradient(135deg, rgba(120,87,255,.95), rgba(91,60,215,.95));
+  box-shadow: 0 8px 22px rgba(88,58,215,.22);
+}
+
+.nav-icon {
+  display: inline-block;
+  margin-right: 5px;
+  font-size: 14px;
+  vertical-align: -1px;
+}
+
+/* Desktop: the meme page is the right-hand content area. */
+.memes-page {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  display: none;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 28px;
+  background:
+    radial-gradient(circle at 82% 4%, rgba(120,87,255,.12), transparent 30%),
+    radial-gradient(circle at 8% 88%, rgba(255,93,155,.06), transparent 28%),
+    var(--bg);
+}
+
+.memes-page.active {
+  display: block;
+}
+
+.memes-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.memes-header h1 {
+  margin: 0;
+  color: var(--text);
+  font-size: 28px;
+  line-height: 1;
+  letter-spacing: -1px;
+}
+
+.memes-header p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.refresh-memes {
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: var(--panel-2);
+  color: var(--text);
+  font-size: 21px;
+}
+
+.refresh-memes:active {
+  -webkit-transform: scale(.96);
+  transform: scale(.96);
+}
+
+.meme-search {
+  display: flex;
+  align-items: center;
+  height: 46px;
+  margin-bottom: 13px;
+  padding: 0 13px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel-2);
+}
+
+.meme-search > span {
+  margin-right: 8px;
+  color: var(--muted);
+  font-size: 20px;
+}
+
+.meme-search input {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0px none;
+  outline: 0;
+  background: ;
+  color: var(--text);
+  font-size: 13px
+}
+
+.meme-search input:focus {
+  border: 0px none;
+  box-shadow: none;
+  background: ;
+}
+
+.meme-search input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+}
+
+.meme-categories {
+  display: flex;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 0 8px;
+  margin-bottom: 14px;
+  white-space: nowrap;
+}
+
+.meme-category {
+  -webkit-appearance: none;
+  appearance: none;
+  flex: 0 0 auto;
+  height: 34px;
+  margin-right: 7px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--panel-2);
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.meme-category.active {
+  color: #fff;
+  border-color: transparent;
+  background: linear-gradient(135deg, #805cff, #633fe1);
+}
+
+.meme-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  -webkit-column-gap: 12px;
+  column-gap: 12px;
+  row-gap: 12px;
+}
+
+.meme-card {
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: var(--panel-2);
+  box-shadow: 0 12px 28px rgba(0,0,0,.18);
+  cursor: pointer;
+}
+
+.meme-card:active {
+  -webkit-transform: scale(.985);
+  transform: scale(.985);
+}
+
+.meme-image-wrap {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  background: #09080d;
+}
+
+.meme-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 100px;
+  object-fit: cover;
+}
+
+.meme-actions {
+  position: absolute;
+  right: 7px;
+  bottom: 7px;
+}
+
+.meme-action {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0px none;
+  border-radius: 50%;
+  background: rgba(5 4 .78);
+  color: #fff;
+  font-size: 15px;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px)
+}
+
+.meme-info {
+  padding: 9px 10px 10px;
+}
+
+.meme-title {
+  display: block;
+  overflow: hidden;
+  color: #ddd8e7;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.35;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.meme-meta {
+  margin-top: 3px;
+  color: var(--muted-2);
+  font-size: 8px;
+}
+
+.meme-loading {
+  grid-column: 1 / -1;
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.meme-loader {
+  width: 30px;
+  height: 30px;
+  margin-bottom: 11px;
+  border: 3px solid #272330;
+  border-top-color: var(--purple);
+  border-radius: 50%;
+  -webkit-animation: messyMemeSpin .8s linear infinite;
+  animation: messyMemeSpin .8s linear infinite;
+}
+
+@-webkit-keyframes messyMemeSpin {
+  from { -webkit-transform: rotate(0deg); }
+  to { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes messyMemeSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.meme-empty {
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  text-align: center;
+}
+
+.meme-empty.hidden { display: none !important; }
+
+.meme-empty-icon {
+  margin-bottom: 10px;
+  font-size: 40px;
+}
+
+.meme-empty strong {
+  color: var(--text);
+  font-size: 14px;
+}
+
+.meme-empty span {
+  margin-top: 4px;
+  font-size: 11px;
+}
+
+/* Meme viewer */
+.meme-modal {
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: rgba(4,3,7,.94);
+}
+
+.meme-modal.open { display: flex; }
+
+.meme-modal-content {
+  position: relative;
+  width: 100%;
+  max-width: 620px;
+  max-height: 94%;
+  overflow: auto;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--panel);
+}
+
+.meme-modal-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+
+.meme-modal-close {
+  position: absolute;
+  z-index: 2;
+  right: 13px;
+  top: 13px;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 0px none;
+  border-radius: 50%;
+  background: rgba(0 0 .78);
+  color: #fff;
+  font-size: 22px
+}
+
+.meme-modal-tools {
+  display: flex;
+  padding: 9px 3px 2px;
+}
+
+.meme-send-chat {
+  flex: 1;
+  height: 42px;
+  border: 0px none;
+  border-radius: 12px;
+  color: #fff;
+  background: #633fe1);
+  font-size: 12px;
+  font-weight: 800
+}
+
+.meme-send-chat:disabled {
+  opacity: .45;
+}
+
+@media screen and (max-width: 700px) {
+  .app-nav { padding: 0 10px 9px; }
+  .nav-item { height: 41px; font-size: 11px; }
+  .nav-icon { font-size: 13px; }
+
+  .memes-page {
+    position: absolute;
+    z-index: 20;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    padding: 13px 11px 18px;
   }
 
+  .memes-header { margin-bottom: 14px; }
+  .memes-header h1 { font-size: 23px; }
+  .memes-header p { font-size: 10px; }
+  .refresh-memes { width: 39px; height: 39px; }
 
-  .auth-card {
-    max-width: 430px;
+  .meme-search { height: 43px; margin-bottom: 10px; }
+  .meme-categories { margin-bottom: 11px; }
+  .meme-category { height: 32px; font-size: 10px; }
 
-    padding: 16px 20px;
-
-    margin: auto;
+  .meme-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    -webkit-column-gap: 8px;
+    column-gap: 8px;
+    row-gap: 8px;
   }
 
+  .meme-card { border-radius: 12px; }
+  .meme-info { padding: 7px 8px 8px; }
+  .meme-title { font-size: 9px; }
+  .meme-meta { font-size: 8px; }
+  .meme-action { width: 29px; height: 29px; }
 
-  .brand-lockup {
-    margin-bottom: 12px;
-  }
+  .meme-modal { padding: 10px; }
+  .meme-modal-content { border-radius: 15px; }
+}
 
+@media screen and (max-width: 390px) {
+  .memes-page { padding-left: 9px; padding-right: 9px; }
+  .meme-grid { -webkit-column-gap: 7px; column-gap: 7px; row-gap: 7px; }
+  .meme-card { border-radius: 11px; }
+}
 
-  .brand-icon {
-    width: 44px !important;
-    height: 44px !important;
-
-    min-width: 44px !important;
-    max-width: 44px !important;
-
-    min-height: 44px !important;
-    max-height: 44px !important;
-  }
-
+@media screen and (max-height: 500px) and (orientation: landscape) {
+  .memes-page { padding-top: 8px; }
+  .memes-header { margin-bottom: 8px; }
+  .meme-search { height: 38px; }
+  .meme-category { height: 29px; }
 }
