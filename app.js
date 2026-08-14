@@ -2881,3 +2881,230 @@ if (
    ========================================================= */
 
 boot();
+/* =========================================================
+   MAIN APP TAB NAVIGATION
+   Messages / Memes / Discover / Messy AI
+   iOS 12.5 compatible
+   ========================================================= */
+
+(function () {
+
+  var messagesBtn = document.getElementById("messagesTabBtn");
+  var memesBtn = document.getElementById("memesTabBtn");
+  var discoverBtn = document.getElementById("discoverTabBtn");
+  var aiBtn = document.getElementById("aiTabBtn");
+
+  var messagesPage = document.querySelector(".chat");
+  var memesPage = document.getElementById("memesPage");
+  var discoverPage = document.getElementById("discoverPage");
+  var aiPage = document.getElementById("aiPage");
+
+  var searchWrap = document.querySelector(".sidebar .search-wrap");
+  var userList = document.getElementById("userList");
+  var sideTitle = document.getElementById("sidePageTitle");
+
+  function hideAllPages() {
+
+    if (messagesPage) {
+      messagesPage.classList.add("hidden");
+    }
+
+    if (memesPage) {
+      memesPage.classList.add("hidden");
+    }
+
+    if (discoverPage) {
+      discoverPage.classList.add("hidden");
+    }
+
+    if (aiPage) {
+      aiPage.classList.add("hidden");
+    }
+
+  }
+
+
+  function removeActive() {
+
+    var buttons = document.querySelectorAll(
+      ".main-nav-item"
+    );
+
+    for (var i = 0; i < buttons.length; i++) {
+
+      buttons[i].classList.remove("active");
+
+    }
+
+  }
+
+
+  function showTab(name) {
+
+    hideAllPages();
+    removeActive();
+
+
+    if (name === "messages") {
+
+      if (messagesPage) {
+        messagesPage.classList.remove("hidden");
+      }
+
+      if (messagesBtn) {
+        messagesBtn.classList.add("active");
+      }
+
+      if (searchWrap) {
+        searchWrap.classList.remove("hidden");
+      }
+
+      if (userList) {
+        userList.classList.remove("hidden");
+      }
+
+      if (sideTitle) {
+        sideTitle.textContent = "Messages";
+      }
+
+    }
+
+
+    else if (name === "memes") {
+
+      if (memesPage) {
+        memesPage.classList.remove("hidden");
+      }
+
+      if (memesBtn) {
+        memesBtn.classList.add("active");
+      }
+
+      if (searchWrap) {
+        searchWrap.classList.add("hidden");
+      }
+
+      if (userList) {
+        userList.classList.add("hidden");
+      }
+
+      if (sideTitle) {
+        sideTitle.textContent = "Memes";
+      }
+
+    }
+
+
+    else if (name === "discover") {
+
+      if (discoverPage) {
+        discoverPage.classList.remove("hidden");
+      }
+
+      if (discoverBtn) {
+        discoverBtn.classList.add("active");
+      }
+
+      if (searchWrap) {
+        searchWrap.classList.add("hidden");
+      }
+
+      if (userList) {
+        userList.classList.add("hidden");
+      }
+
+      if (sideTitle) {
+        sideTitle.textContent = "Discover";
+      }
+
+    }
+
+
+    else if (name === "ai") {
+
+      if (aiPage) {
+        aiPage.classList.remove("hidden");
+      }
+
+      if (aiBtn) {
+        aiBtn.classList.add("active");
+      }
+
+      if (searchWrap) {
+        searchWrap.classList.add("hidden");
+      }
+
+      if (userList) {
+        userList.classList.add("hidden");
+      }
+
+      if (sideTitle) {
+        sideTitle.textContent = "Messy AI";
+      }
+
+    }
+
+  }
+
+
+  if (messagesBtn) {
+
+    messagesBtn.addEventListener(
+      "click",
+      function () {
+
+        showTab("messages");
+
+      }
+    );
+
+  }
+
+
+  if (memesBtn) {
+
+    memesBtn.addEventListener(
+      "click",
+      function () {
+
+        showTab("memes");
+
+      }
+    );
+
+  }
+
+
+  if (discoverBtn) {
+
+    discoverBtn.addEventListener(
+      "click",
+      function () {
+
+        showTab("discover");
+
+      }
+    );
+
+  }
+
+
+  if (aiBtn) {
+
+    aiBtn.addEventListener(
+      "click",
+      function () {
+
+        showTab("ai");
+
+      }
+    );
+
+  }
+
+
+  /* Start on Messages */
+
+  showTab("messages");
+
+})();
